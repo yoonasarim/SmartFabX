@@ -1,1 +1,3025 @@
-<!DOCTYPE html><html><head><title>SmartFabX</title></head><body><div id='root'></div></body></html>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MP70 Fixed Window Configurator</title>
+    <link rel="stylesheet" href="mp70_fix.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="mp70_fix_types.js"></script>
+    <script src="mp70_fix_formulas.js"></script>
+    <script src="mp70_fix_config.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+</head>
+<body>
+    <nav class="main-nav">
+        <div class="nav-left">
+            <a href="/index.html" class="nav-item"><i class="fas fa-home"></i> Home</a>
+            <a href="/projects.html" class="nav-item"><i class="fas fa-folder-open"></i> Projects</a>
+            <a href="/systems.html" class="nav-item"><i class="fas fa-cubes"></i> Systems</a>
+        </div>
+        <div class="nav-title">MP70 Fixed Window Configurator</div>
+        <div class="nav-right">
+            <button id="save-btn" class="nav-btn"><i class="fas fa-save"></i> Save</button>
+            <button id="discard-btn" class="nav-btn"><i class="fas fa-trash-alt"></i> Discard</button>
+            <button id="exit-btn" class="nav-btn"><i class="fas fa-times"></i> Exit</button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="status-bar">
+            <div class="project-info">
+                <span class="project-label">Project:</span>
+                <span id="project-name">New Project</span>
+            </div>
+            <div class="status-message" id="status-message">Ready</div>
+            <div class="last-saved">
+                <span class="saved-label">Last saved:</span>
+                <span id="last-saved-time">Never</span>
+            </div>
+        </div>
+
+        <div class="tab-container">
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="position"><i class="fas fa-drafting-compass"></i> Position Drawing</button>
+                <button class="tab-btn" data-tab="assembly"><i class="fas fa-list-check"></i> Assembly List</button>
+                <button class="tab-btn" data-tab="stock"><i class="fas fa-boxes-stacked"></i> Stock List</button>
+                <button class="tab-btn" data-tab="cut"><i class="fas fa-cut"></i> Cut Optimization</button>
+            </div>
+
+            <div class="tab-content active" id="position-tab">
+                <div class="config-container">
+                    <div class="config-panel">
+                        <h2><i class="fas fa-sliders"></i> Configuration</h2>
+                        
+                        <div class="form-group">
+                            <label for="position-code">Position Code:</label>
+                            <input type="text" id="position-code" placeholder="e.g., MP70-F001">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="window-type">Window Type:</label>
+                            <select id="window-type">
+                                <option value="F1">Single Fixed Frame (F1)</option>
+                                <option value="F2H">Fixed with Horizontal Transom (F2H)</option>
+                                <option value="F2V">Fixed with Vertical Mullion (F2V)</option>
+                                <option value="F4">Fixed with Cross Mullion/Transom (F4)</option>
+                                <option value="F3H">Fixed with Double Horizontal Transom (F3H)</option>
+                                <option value="F3V">Fixed with Double Vertical Mullion (F3V)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="width">Width (mm):</label>
+                            <input type="number" id="width" min="300" max="4000" value="1900">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="height">Height (mm):</label>
+                            <input type="number" id="height" min="300" max="4000" value="3600">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="quantity">Quantity:</label>
+                            <input type="number" id="quantity" min="1" max="100" value="1">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="h-panels">Horizontal Panels:</label>
+                            <div class="panel-input">
+                                <input type="number" id="h-panels" min="1" max="5" value="1">
+                                <button id="add-h-sizes" class="small-btn">Add Sizes</button>
+                            </div>
+                        </div>
+                        
+                        <div id="h-panels-sizes" class="hidden panel-sizes">
+                            <!-- Horizontal panel sizes will be added here -->
+                        </div>
+
+                        <div class="form-group">
+                            <label for="v-panels">Vertical Panels:</label>
+                            <div class="panel-input">
+                                <input type="number" id="v-panels" min="1" max="5" value="1">
+                                <button id="add-v-sizes" class="small-btn">Add Sizes</button>
+                            </div>
+                        </div>
+                        
+                        <div id="v-panels-sizes" class="hidden panel-sizes">
+                            <!-- Vertical panel sizes will be added here -->
+                        </div>
+
+                        <div class="form-group">
+                            <label for="glass-thickness">Glass Thickness (mm):</label>
+                            <select id="glass-thickness">
+                                <option value="28">28mm (6mm+6mm)</option>
+                                <option value="32" selected>32mm (8mm+8mm)</option>
+                                <option value="38">38mm (8mm+10mm)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="color-type">Color Type:</label>
+                            <select id="color-type">
+                                <option value="RAL">RAL</option>
+                                <option value="Anodized">Anodized</option>
+                                <option value="MF">MF</option>
+                                <option value="Kynar">Kynar</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="color-code">Color Code:</label>
+                            <input type="text" id="color-code" placeholder="e.g., 9005">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="gasket-color">Gasket Color:</label>
+                            <select id="gasket-color">
+                                <option value="Black">Black</option>
+                                <option value="Grey">Grey</option>
+                                <option value="White">White</option>
+                            </select>
+                        </div>
+
+                        <button id="generate-btn" class="primary-btn"><i class="fas fa-cog"></i> Generate</button>
+                    </div>
+
+                    <div class="preview-panel">
+                        <h2><i class="fas fa-eye"></i> Window Preview</h2>
+                        <div class="window-preview" id="window-preview">
+                            <!-- SVG preview will be generated here -->
+                        </div>
+                        <div class="dimensions-info">
+                            <div>
+                                <p><i class="fas fa-arrows-alt-h"></i> Width: <span id="preview-width">1900</span> mm</p>
+                                <p><i class="fas fa-arrows-alt-v"></i> Height: <span id="preview-height">3600</span> mm</p>
+                                <p><i class="fas fa-cubes"></i> Quantity: <span id="preview-quantity">1</span></p>
+                            </div>
+                            <div>
+                                <p><i class="fas fa-vector-square"></i> Area: <span id="preview-area">6.84</span> m²</p>
+                                <p><i class="fas fa-border-style"></i> Perimeter: <span id="preview-perimeter">11000</span> mm</p>
+                                <p><i class="fas fa-weight-hanging"></i> Total Weight: <span id="preview-weight">0</span> kg</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-content" id="assembly-tab">
+                <h2><i class="fas fa-list-check"></i> Assembly List</h2>
+                <div id="assembly-content">
+                    <p class="placeholder-message">Click "Generate" on the Position Drawing tab to view the Assembly List.</p>
+                </div>
+            </div>
+
+            <div class="tab-content" id="stock-tab">
+                <h2><i class="fas fa-boxes-stacked"></i> Stock List</h2>
+                <div id="stock-content">
+                    <p class="placeholder-message">Click "Generate" on the Position Drawing tab to view the Stock List.</p>
+                </div>
+            </div>
+
+            <div class="tab-content" id="cut-tab">
+                <h2><i class="fas fa-cut"></i> Cut Optimization</h2>
+                <div id="cut-content">
+                    <p class="placeholder-message">Click "Generate" on the Position Drawing tab to view the Cut Optimization.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="actions-panel">
+            <button id="save-project-btn" class="action-btn"><i class="fas fa-save"></i> Save to Project</button>
+            <button id="export-pdf-btn" class="action-btn"><i class="fas fa-file-pdf"></i> Export to PDF</button>
+            <button id="export-csv-btn" class="action-btn"><i class="fas fa-file-csv"></i> Export to CSV</button>
+            <button id="export-json-btn" class="action-btn"><i class="fas fa-file-code"></i> Export to JSON</button>
+            <button id="print-btn" class="action-btn"><i class="fas fa-print"></i> Print</button>
+        </div>
+    </div>
+
+    <!-- Modal for saving project -->
+    <div id="save-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-save"></i> Save to Project</h2>
+                <span class="close-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="project-title">Project Name:</label>
+                    <input type="text" id="project-title" placeholder="Enter project name">
+                </div>
+                <div class="form-group">
+                    <label for="project-description">Description:</label>
+                    <textarea id="project-description" rows="3" placeholder="Enter project description"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="project-folder">Save to Folder:</label>
+                    <select id="project-folder">
+                        <option value="current">Current Projects</option>
+                        <option value="archive">Archived Projects</option>
+                        <option value="templates">Templates</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="cancel-save" class="secondary-btn">Cancel</button>
+                <button id="confirm-save" class="primary-btn">Save Project</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize jsPDF
+            window.jsPDF = window.jspdf.jsPDF;
+
+            // Tab Switching
+            const tabButtons = document.querySelectorAll('.tab-btn');
+            tabButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Deactivate all tabs
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(content => {
+                        content.classList.remove('active');
+                    });
+                    
+                    // Activate the clicked tab
+                    this.classList.add('active');
+                    const tabId = this.getAttribute('data-tab');
+                    document.getElementById(`${tabId}-tab`).classList.add('active');
+                });
+            });
+            
+            // Update preview dimensions
+            document.getElementById('width').addEventListener('input', updatePreviewDimensions);
+            document.getElementById('height').addEventListener('input', updatePreviewDimensions);
+            document.getElementById('quantity').addEventListener('input', updatePreviewDimensions);
+            document.getElementById('glass-thickness').addEventListener('change', updatePreviewDimensions);
+            
+            // Update preview when window type changes
+            document.getElementById('window-type').addEventListener('change', function() {
+                updateWindowPreview();
+                togglePanelInputs();
+            });
+            
+            // Handle horizontal panel sizes
+            document.getElementById('add-h-sizes').addEventListener('click', function() {
+                const panelCount = parseInt(document.getElementById('h-panels').value);
+                addPanelSizeInputs('h-panels-sizes', panelCount, 'width');
+            });
+            
+            // Handle vertical panel sizes
+            document.getElementById('add-v-sizes').addEventListener('click', function() {
+                const panelCount = parseInt(document.getElementById('v-panels').value);
+                addPanelSizeInputs('v-panels-sizes', panelCount, 'height');
+            });
+            
+            // Generate button
+            document.getElementById('generate-btn').addEventListener('click', function() {
+                showStatusMessage("Generating configuration...");
+                setTimeout(() => {
+                    generateAll();
+                    showStatusMessage("Configuration generated successfully!", "success");
+                }, 500);
+            });
+            
+            // Navigation buttons
+            document.getElementById('save-btn').addEventListener('click', function() {
+                document.getElementById('save-modal').style.display = 'block';
+            });
+            
+            document.getElementById('discard-btn').addEventListener('click', function() {
+                if(confirm("Are you sure you want to discard all changes?")) {
+                    showStatusMessage("Changes discarded", "info");
+                    resetForm();
+                }
+            });
+            
+            document.getElementById('exit-btn').addEventListener('click', function() {
+                if(confirm("Exit configurator? Any unsaved changes will be lost.")) {
+                    window.location.href = "/index.html";
+                }
+            });
+            
+            // Modal close button
+            document.querySelector('.close-modal').addEventListener('click', function() {
+                document.getElementById('save-modal').style.display = 'none';
+            });
+            
+            // Modal save button
+            document.getElementById('confirm-save').addEventListener('click', function() {
+                const projectName = document.getElementById('project-title').value || "Unnamed Project";
+                document.getElementById('project-name').textContent = projectName;
+                
+                const now = new Date();
+                document.getElementById('last-saved-time').textContent = now.toLocaleTimeString();
+                
+                document.getElementById('save-modal').style.display = 'none';
+                showStatusMessage("Project saved successfully!", "success");
+            });
+            
+            document.getElementById('cancel-save').addEventListener('click', function() {
+                document.getElementById('save-modal').style.display = 'none';
+            });
+            
+            // Save to project button
+            document.getElementById('save-project-btn').addEventListener('click', function() {
+                document.getElementById('save-modal').style.display = 'block';
+            });
+            
+            // Export buttons
+            document.getElementById('export-pdf-btn').addEventListener('click', exportToPDF);
+            document.getElementById('export-csv-btn').addEventListener('click', exportToCSV);
+            document.getElementById('export-json-btn').addEventListener('click', exportToJSON);
+            document.getElementById('print-btn').addEventListener('click', function() {
+                window.print();
+            });
+            
+            // Initialize preview and panel visibility
+            updateWindowPreview();
+            togglePanelInputs();
+        });
+        
+        function showStatusMessage(message, type = "info") {
+            const statusElement = document.getElementById('status-message');
+            statusElement.textContent = message;
+            
+            // Reset the class
+            statusElement.className = 'status-message';
+            
+            // Add the appropriate class based on the message type
+            statusElement.classList.add(`status-${type}`);
+            
+            // Clear the message after a few seconds for success/info messages
+            if (type === "success" || type === "info") {
+                setTimeout(() => {
+                    statusElement.textContent = "Ready";
+                    statusElement.className = 'status-message';
+                }, 3000);
+            }
+        }
+        
+        function resetForm() {
+            // Reset form fields to defaults
+            document.getElementById('position-code').value = '';
+            document.getElementById('window-type').value = 'F1';
+            document.getElementById('width').value = '1900';
+            document.getElementById('height').value = '3600';
+            document.getElementById('quantity').value = '1';
+            document.getElementById('h-panels').value = '1';
+            document.getElementById('v-panels').value = '1';
+            document.getElementById('glass-thickness').value = '32';
+            document.getElementById('color-type').value = 'RAL';
+            document.getElementById('color-code').value = '';
+            document.getElementById('gasket-color').value = 'Black';
+            
+            // Reset preview
+            updatePreviewDimensions();
+            togglePanelInputs();
+            
+            // Clear all tabs except position
+            document.getElementById('assembly-content').innerHTML = '<p class="placeholder-message">Click "Generate" on the Position Drawing tab to view the Assembly List.</p>';
+            document.getElementById('stock-content').innerHTML = '<p class="placeholder-message">Click "Generate" on the Position Drawing tab to view the Stock List.</p>';
+            document.getElementById('cut-content').innerHTML = '<p class="placeholder-message">Click "Generate" on the Position Drawing tab to view the Cut Optimization.</p>';
+            
+            // Switch back to position tab
+            document.querySelector('[data-tab="position"]').click();
+        }
+        
+        function togglePanelInputs() {
+            const windowType = document.getElementById('window-type').value;
+            const hPanelsGroup = document.getElementById('h-panels').closest('.form-group');
+            const vPanelsGroup = document.getElementById('v-panels').closest('.form-group');
+            const hPanelsSizes = document.getElementById('h-panels-sizes');
+            const vPanelsSizes = document.getElementById('v-panels-sizes');
+            
+            // Hide all panel inputs first
+            hPanelsGroup.style.display = 'none';
+            vPanelsGroup.style.display = 'none';
+            hPanelsSizes.classList.add('hidden');
+            vPanelsSizes.classList.add('hidden');
+            
+            // Show relevant panels based on window type
+            switch(windowType) {
+                case 'F2H':
+                case 'F3H':
+                    hPanelsGroup.style.display = 'block';
+                    document.getElementById('h-panels').value = windowType === 'F2H' ? 2 : 3;
+                    break;
+                    
+                case 'F2V':
+                case 'F3V':
+                    vPanelsGroup.style.display = 'block';
+                    document.getElementById('v-panels').value = windowType === 'F2V' ? 2 : 3;
+                    break;
+                    
+                case 'F4':
+                    hPanelsGroup.style.display = 'block';
+                    vPanelsGroup.style.display = 'block';
+                    document.getElementById('h-panels').value = 2;
+                    document.getElementById('v-panels').value = 2;
+                    break;
+                    
+                case 'F1':
+                default:
+                    // Single panel - nothing to show
+                    break;
+            }
+            
+            // Update the preview dimensions after changing panel configuration
+            updatePreviewDimensions();
+        }
+        
+        function calculateTotalWeight() {
+            const width = parseInt(document.getElementById('width').value);
+            const height = parseInt(document.getElementById('height').value);
+            const quantity = parseInt(document.getElementById('quantity').value);
+            const windowType = document.getElementById('window-type').value;
+            const glassThickness = parseInt(document.getElementById('glass-thickness').value);
+            
+            // Profile weights (kg/m)
+            const FRAME_WEIGHT = 1.44; // COR-7635 weight in kg/m
+            const MULLION_WEIGHT = 2.284; // COR-7670 weight in kg/m
+            
+            // Glazing bead weights (kg/m)
+            const GLAZE_BEAD_WEIGHTS = {
+                '28': 0.321, // COR-2015
+                '32': 0.294, // COR-2117
+                '38': 0.270  // COR-2065
+            };
+            
+            // Glass weights per thickness (kg/m²)
+            const GLASS_WEIGHTS = {
+                '28': 30, // 6mm+6mm (approx. 15kg/m² per pane)
+                '32': 40, // 8mm+8mm (approx. 20kg/m² per pane)
+                '38': 45  // 8mm+10mm (approx. 20kg/m² + 25kg/m²)
+            };
+            
+            // Calculate frame perimeter in meters
+            const framePerimeter = (width * 2 + height * 2) / 1000;
+            
+            // Calculate frame weight
+            let totalWeight = framePerimeter * FRAME_WEIGHT;
+            
+            // Calculate mullion/transom weight based on window type
+            let mullionLength = 0;
+            
+            switch(windowType) {
+                case 'F2H':
+                    mullionLength = width / 1000; // One horizontal transom
+                    break;
+                case 'F2V':
+                    mullionLength = height / 1000; // One vertical mullion
+                    break;
+                case 'F3H':
+                    mullionLength = (width * 2) / 1000; // Two horizontal transoms
+                    break;
+                case 'F3V':
+                    mullionLength = (height * 2) / 1000; // Two vertical mullions
+                    break;
+                case 'F4':
+                    mullionLength = (width + height) / 1000; // Cross configuration
+                    break;
+            }
+            
+            totalWeight += mullionLength * MULLION_WEIGHT;
+            
+            // Calculate glazing bead weight
+            // Estimate glazing bead length based on window type
+            let glazingPerimeter = framePerimeter;
+            if (windowType === 'F2H' || windowType === 'F2V') {
+                glazingPerimeter += mullionLength * 2;
+            } else if (windowType === 'F3H' || windowType === 'F3V') {
+                glazingPerimeter += mullionLength * 2;
+            } else if (windowType === 'F4') {
+                glazingPerimeter += mullionLength * 2;
+            }
+            
+            totalWeight += glazingPerimeter * GLAZE_BEAD_WEIGHTS[glassThickness.toString()];
+            
+            // Calculate glass weight
+            const glassArea = (width * height) / 1000000; // m²
+            let numPanels = 1;
+            
+            switch(windowType) {
+                case 'F1':
+                    numPanels = 1;
+                    break;
+                case 'F2H':
+                case 'F2V':
+                    numPanels = 2;
+                    break;
+                case 'F3H':
+                case 'F3V':
+                    numPanels = 3;
+                    break;
+                case 'F4':
+                    numPanels = 4;
+                    break;
+            }
+            
+            totalWeight += glassArea * GLASS_WEIGHTS[glassThickness.toString()];
+            
+            // Add hardware weight (estimate as 5% of total weight)
+            totalWeight *= 1.05;
+            
+            // Multiply by quantity
+            totalWeight *= quantity;
+            
+            return totalWeight.toFixed(2);
+        }
+        
+        function updatePreviewDimensions() {
+            const width = document.getElementById('width').value;
+            const height = document.getElementById('height').value;
+            const quantity = document.getElementById('quantity').value;
+            
+            document.getElementById('preview-width').textContent = width;
+            document.getElementById('preview-height').textContent = height;
+            document.getElementById('preview-quantity').textContent = quantity;
+            
+            // Calculate area in square meters
+            const area = ((width * height / 1000000) * quantity).toFixed(2);
+            document.getElementById('preview-area').textContent = area;
+            
+            // Calculate perimeter in mm
+            const perimeter = (width * 2 + height * 2) * quantity;
+            document.getElementById('preview-perimeter').textContent = perimeter;
+            
+            // Calculate total weight
+            const weight = calculateTotalWeight();
+            document.getElementById('preview-weight').textContent = weight;
+            
+            updateWindowPreview();
+        }
+        
+        function updateWindowPreview() {
+            const windowType = document.getElementById('window-type').value;
+            const width = parseInt(document.getElementById('width').value);
+            const height = parseInt(document.getElementById('height').value);
+            
+            const preview = document.getElementById('window-preview');
+            preview.innerHTML = generateWindowSVG(windowType, width, height);
+        }
+        
+        function generateWindowSVG(type, width, height) {
+            // Calculate scaled dimensions for the SVG (maintaining aspect ratio)
+            const maxPreviewWidth = 380;
+            const maxPreviewHeight = 300;
+            
+            const aspectRatio = width / height;
+            let svgWidth, svgHeight;
+            
+            if (aspectRatio > 1) {
+                // Wider than tall
+                svgWidth = maxPreviewWidth;
+                svgHeight = svgWidth / aspectRatio;
+            } else {
+                // Taller than wide or square
+                svgHeight = maxPreviewHeight;
+                svgWidth = svgHeight * aspectRatio;
+            }
+            
+            // Scale factor for visual elements
+            const scale = Math.min(svgWidth / width, svgHeight / height);
+            
+            // Start SVG
+            let svg = `<svg width="${svgWidth}" height="${svgHeight}" viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">`;
+            
+            // Draw outer frame
+            svg += `<rect x="0" y="0" width="${width}" height="${height}" fill="#E0E0E0" stroke="#000000" stroke-width="2" />`;
+            
+            // Add inner frame offset (70mm profile width)
+            const frameWidth = 70;
+            svg += `<rect x="${frameWidth}" y="${frameWidth}" width="${width - frameWidth * 2}" height="${height - frameWidth * 2}" fill="#D0F0FF" stroke="#000000" stroke-width="1" />`;
+            
+            // Add dividers based on window type
+            switch (type) {
+                case 'F2H': // Horizontal transom
+                    const transom_y = height / 2;
+                    svg += `<line x1="${frameWidth}" y1="${transom_y}" x2="${width - frameWidth}" y2="${transom_y}" stroke="#000000" stroke-width="4" />`;
+                    break;
+                    
+                case 'F2V': // Vertical mullion
+                    const mullion_x = width / 2;
+                    svg += `<line x1="${mullion_x}" y1="${frameWidth}" x2="${mullion_x}" y2="${height - frameWidth}" stroke="#000000" stroke-width="4" />`;
+                    break;
+                    
+                case 'F4': // Cross configuration
+                    const cross_x = width / 2;
+                    const cross_y = height / 2;
+                    svg += `<line x1="${frameWidth}" y1="${cross_y}" x2="${width - frameWidth}" y2="${cross_y}" stroke="#000000" stroke-width="4" />`;
+                    svg += `<line x1="${cross_x}" y1="${frameWidth}" x2="${cross_x}" y2="${height - frameWidth}" stroke="#000000" stroke-width="4" />`;
+                    break;
+                    
+                case 'F3H': // Two horizontal transoms
+                    const h1 = height / 3;
+                    const h2 = (height / 3) * 2;
+                    svg += `<line x1="${frameWidth}" y1="${h1}" x2="${width - frameWidth}" y2="${h1}" stroke="#000000" stroke-width="4" />`;
+                    svg += `<line x1="${frameWidth}" y1="${h2}" x2="${width - frameWidth}" y2="${h2}" stroke="#000000" stroke-width="4" />`;
+                    break;
+                    
+                case 'F3V': // Two vertical mullions
+                    const v1 = width / 3;
+                    const v2 = (width / 3) * 2;
+                    svg += `<line x1="${v1}" y1="${frameWidth}" x2="${v1}" y2="${height - frameWidth}" stroke="#000000" stroke-width="4" />`;
+                    svg += `<line x1="${v2}" y1="${frameWidth}" x2="${v2}" y2="${height - frameWidth}" stroke="#000000" stroke-width="4" />`;
+                    break;
+            }
+            
+            // Add dimensions
+            const textSize = Math.max(12, Math.min(width, height) * scale / 20);
+            
+            // Width dimension
+            svg += `<text x="${width/2}" y="${height + 20}" text-anchor="middle" font-size="${textSize}px">${width} mm</text>`;
+            
+            // Height dimension
+            svg += `<text x="${-height/2}" y="${-10}" text-anchor="middle" font-size="${textSize}px" transform="rotate(-90)">${height} mm</text>`;
+            
+            // Close SVG
+            svg += '</svg>';
+            
+            return svg;
+        }
+        
+        function addPanelSizeInputs(containerId, count, dimension) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';  // Clear existing inputs
+            
+            const totalSize = parseInt(document.getElementById(dimension).value);
+            const defaultSize = Math.round(totalSize / count);
+            
+            for (let i = 0; i < count; i++) {
+                const panelDiv = document.createElement('div');
+                panelDiv.className = 'panel-size-input';
+                
+                panelDiv.innerHTML = `
+                    <label for="${dimension}-panel-${i+1}">Panel ${i+1} (mm):</label>
+                    <input type="number" id="${dimension}-panel-${i+1}" value="${defaultSize}" min="100">
+                `;
+                
+                container.appendChild(panelDiv);
+            }
+            
+            container.classList.remove('hidden');
+        }
+        
+        function collectConfiguration() {
+            return {
+                positionCode: document.getElementById('position-code').value || 'MP70-F001',
+                windowType: document.getElementById('window-type').value,
+                width: parseInt(document.getElementById('width').value),
+                height: parseInt(document.getElementById('height').value),
+                quantity: parseInt(document.getElementById('quantity').value),
+                hPanels: parseInt(document.getElementById('h-panels').value),
+                vPanels: parseInt(document.getElementById('v-panels').value),
+                hPanelSizes: collectPanelSizes('h-panels-sizes', 'width'),
+                vPanelSizes: collectPanelSizes('v-panels-sizes', 'height'),
+                glassThickness: parseInt(document.getElementById('glass-thickness').value),
+                colorType: document.getElementById('color-type').value,
+                colorCode: document.getElementById('color-code').value || '9005',
+                gasketColor: document.getElementById('gasket-color').value
+            };
+        }
+        
+        function collectPanelSizes(containerId, dimension) {
+            const container = document.getElementById(containerId);
+            const inputs = container.querySelectorAll('input[type="number"]');
+            const sizes = [];
+            
+            inputs.forEach(input => {
+                sizes.push(parseInt(input.value));
+            });
+            
+            // If no sizes were added, create default even distribution
+            if (sizes.length === 0) {
+                const totalSize = parseInt(document.getElementById(dimension).value);
+                const panelCount = parseInt(document.getElementById(dimension === 'width' ? 'h-panels' : 'v-panels').value);
+                const defaultSize = Math.round(totalSize / panelCount);
+                
+                for (let i = 0; i < panelCount; i++) {
+                    sizes.push(defaultSize);
+                }
+            }
+            
+            return sizes;
+        }
+        
+        function generateAll() {
+            const config = collectConfiguration();
+            
+            // Get configurator instance from the config.js file
+            const configurator = new MP70FixedWindowConfigurator(config);
+            
+            // Generate all reports
+            generateAssemblyList(configurator);
+            generateStockList(configurator);
+            generateCutOptimization(configurator);
+            
+            // Switch to Assembly List tab
+            document.querySelector('[data-tab="assembly"]').click();
+        }
+        
+        function generateAssemblyList(configurator) {
+            const container = document.getElementById('assembly-content');
+            
+            // Generate the HTML for assembly list using the formulas from mp70_fix_formulas.js
+            const bom = configurator.generateBOM();
+            const glassDimensions = configurator.getGlassDimensions();
+            const windowType = document.getElementById('window-type').value;
+            const width = parseInt(document.getElementById('width').value);
+            const height = parseInt(document.getElementById('height').value);
+            const quantity = parseInt(document.getElementById('quantity').value);
+            const totalWeight = calculateTotalWeight();
+            
+            // Get the window preview SVG
+            const windowPreview = generateWindowSVG(windowType, width, height);
+            
+            let html = `
+                <div class="assembly-list">
+                    <div class="assembly-header">
+                        <div class="assembly-info">
+                            <p><strong>Position:</strong> ${configurator.positionCode}</p>
+                            <p><strong>Size:</strong> ${configurator.width} x ${configurator.height} mm</p>
+                            <p><strong>Quantity:</strong> ${quantity}</p>
+                            <p><strong>System:</strong> Cortizo Millennium Plus 70 Fixed</p>
+                            <p><strong>Color:</strong> ${configurator.colorType} ${configurator.colorCode}</p>
+                            <p><strong>Total Weight:</strong> ${totalWeight} kg</p>
+                        </div>
+                        <div class="assembly-preview">
+                            ${windowPreview}
+                        </div>
+                    </div>
+                    
+                    <h3><i class="fas fa-border-all"></i> Frame Element</h3>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Quantity</th>
+                                <th>Number</th>
+                                <th>Description</th>
+                                <th>Length (mm)</th>
+                                <th>Cut</th>
+                                <th>Orientation</th>
+                                <th>Weight (kg)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            
+            // Add profiles
+            let totalProfileWeight = 0;
+            bom.profiles.forEach(profile => {
+                const isFrame = profile.type.includes('frame');
+                const profileWeight = isFrame ? 
+                    (profile.length / 1000 * 1.44 * quantity) : 
+                    (profile.length / 1000 * 2.284 * quantity);
+                    
+                totalProfileWeight += profileWeight;
+                
+                html += `
+                    <tr>
+                        <td>${profile.quantity * quantity} Pcs.</td>
+                        <td>${profile.code}</td>
+                        <td>${getProfileDescription(profile.code)}</td>
+                        <td>${profile.length}</td>
+                        <td>${isFrame ? '45° - 45°' : '90° - 90°'}</td>
+                        <td>${profile.type.includes('top') ? 'T' : 
+                             profile.type.includes('bottom') ? 'B' : 
+                             profile.type.includes('left') ? 'L' : 
+                             profile.type.includes('right') ? 'R' :
+                             profile.type.includes('transom') ? 'H' : 'V'}</td>
+                        <td>${profileWeight.toFixed(2)}</td>
+                    </tr>
+                `;
+            });
+            
+            html += `
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="6" style="text-align: right;"><strong>Total Frame Weight:</strong></td>
+                                <td>${totalProfileWeight.toFixed(2)} kg</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                    
+                    <h3><i class="fas fa-square"></i> Glass</h3>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Quantity</th>
+                                <th>Width (mm)</th>
+                                <th>Height (mm)</th>
+                                <th>Area (m²)</th>
+                                <th>Description</th>
+                                <th>Weight (kg)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            
+            // Add glass panels
+            let totalGlassWeight = 0;
+            const glassWeights = {
+                '28': 30, // 6mm+6mm (approx. 15kg/m² per pane)
+                '32': 40, // 8mm+8mm (approx. 20kg/m² per pane)
+                '38': 45  // 8mm+10mm (approx. 20kg/m² + 25kg/m²)
+            };
+            
+            glassDimensions.forEach(glass => {
+                const area = ((glass.width * glass.height) / 1000000).toFixed(2);
+                const glassWeight = area * glassWeights[configurator.glassThickness.toString()] * quantity;
+                totalGlassWeight += parseFloat(glassWeight.toFixed(2));
+                
+                const glassDesc = configurator.glassThickness === 28 ? '28mm (6mm+6mm)' : 
+                                  configurator.glassThickness === 32 ? '32mm (8mm+8mm)' : 
+                                  '38mm (8mm+10mm)';
+                
+                html += `
+                    <tr>
+                        <td>${quantity} Pcs.</td>
+                        <td>${glass.width}</td>
+                        <td>${glass.height}</td>
+                        <td>${area}</td>
+                        <td>${glassDesc}</td>
+                        <td>${glassWeight.toFixed(2)}</td>
+                    </tr>
+                `;
+            });
+            
+            html += `
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="5" style="text-align: right;"><strong>Total Glass Weight:</strong></td>
+                                <td>${totalGlassWeight.toFixed(2)} kg</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                    
+                    <h3><i class="fas fa-border-none"></i> Glazing Bead</h3>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Quantity</th>
+                                <th>Number</th>
+                                <th>Description</th>
+                                <th>Length (mm)</th>
+                                <th>Cut</th>
+                                <th>Color</th>
+                                <th>Weight (kg)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            
+                      // Add glazing beads based on glass thickness
+            const glazingBeadCode = configurator.glassThickness === 28 ? 'COR-2015' : 
+                                     configurator.glassThickness === 38 ? 'COR-2065' : 'COR-2117';
+            
+            const glazingBeadWeight = {
+                '28': 0.321, // COR-2015
+                '32': 0.294, // COR-2117
+                '38': 0.270  // COR-2065
+            };
+            
+            let totalHorizontalLength = 0;            console.log("generateAssemblyList function executed");
+            let totalVerticalLength = 0;
+            let totalGlazingBeadWeight = 0;
+            
+            // Calculate total lengths of horizontal and vertical glazing beads
+            glassDimensions.forEach(glass => {
+                totalHorizontalLength += glass.width * 2;
+                totalVerticalLength += glass.height * 2;
+            });
+            
+            const horizontalLength = Math.ceil(totalHorizontalLength / glassDimensions.length / 2);
+            const verticalLength = Math.ceil(totalVerticalLength / glassDimensions.length / 2);
+            
+            const horizontalGlazingWeight = (horizontalLength / 1000) * 
+                glazingBeadWeight[configurator.glassThickness.toString()] * 
+                glassDimensions.length * 2 * quantity;
+            
+            const verticalGlazingWeight = (verticalLength / 1000) * 
+                glazingBeadWeight[configurator.glassThickness.toString()] * 
+                glassDimensions.length * 2 * quantity;
+            
+            totalGlazingBeadWeight = horizontalGlazingWeight + verticalGlazingWeight;
+            
+            // Add glazing bead rows to the HTML
+            html += `
+                <tr>
+                    <td>${glassDimensions.length * 2 * quantity} Pcs.</td>
+                    <td>${glazingBeadCode}</td>
+                    <td>Straight glazing bead for ${configurator.glassThickness}mm</td>
+                    <td>${horizontalLength}</td>
+                    <td>90° - 90°</td>
+                    <td>${configurator.colorType} ${configurator.colorCode}</td>
+                    <td>${horizontalGlazingWeight.toFixed(2)}</td>
+                </tr>
+                <tr>
+                    <td>${glassDimensions.length * 2 * quantity} Pcs.</td>
+                    <td>${glazingBeadCode}</td>
+                    <td>Straight glazing bead for ${configurator.glassThickness}mm</td>
+                    <td>${verticalLength}</td>
+                    <td>90° - 90°</td>
+                    <td>${configurator.colorType} ${configurator.colorCode}</td>
+                    <td>${verticalGlazingWeight.toFixed(2)}</td>
+                </tr>
+            `;
+            
+            html += `
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="6" style="text-align: right;"><strong>Total Glazing Bead Weight:</strong></td>
+                                <td>${totalGlazingBeadWeight.toFixed(2)} kg</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                    
+                    <h3><i class="fas fa-grip-lines"></i> Gaskets</h3>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Quantity</th>
+                                <th>Number</th>
+                                <th>Description</th>
+                                <th>Color</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            
+            // Add gaskets
+            bom.gaskets.forEach(gasket => {
+                html += `
+                    <tr>
+                        <td>${((gasket.length / 1000) * quantity).toFixed(2)} m</td>
+                        <td>${gasket.code}</td>
+                        <td>${getGasketDescription(gasket.code)}</td>
+                        <td>${gasket.color}</td>
+                    </tr>
+                `;
+            });
+            
+            html += `
+                        </tbody>
+                    </table>
+                    
+                    <h3><i class="fas fa-screwdriver"></i> Accessories</h3>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Quantity</th>
+                                <th>Number</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            
+            // Add accessories
+            bom.accessories.forEach(accessory => {
+                html += `
+                    <tr>
+                        <td>${accessory.quantity * quantity} pc</td>
+                        <td>${accessory.code}</td>
+                        <td>${getAccessoryDescription(accessory.code)}</td>
+                    </tr>
+                `;
+            });
+            
+            html += `
+                        </tbody>
+                    </table>
+                    
+                    <div class="weight-summary">
+                        <h3><i class="fas fa-weight-hanging"></i> Weight Summary</h3>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Component</th>
+                                    <th>Weight (kg)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Frame</td>
+                                    <td>${totalProfileWeight.toFixed(2)}</td>
+                                </tr>
+                                <tr>
+                                    <td>Glass</td>
+                                    <td>${totalGlassWeight.toFixed(2)}</td>
+                                </tr>
+                                <tr>
+                                    <td>Glazing Bead</td>
+                                    <td>${totalGlazingBeadWeight.toFixed(2)}</td>
+                                </tr>
+                                <tr>
+                                    <td>Accessories & Hardware (est.)</td>
+                                    <td>${(0.05 * (totalProfileWeight + totalGlassWeight + totalGlazingBeadWeight)).toFixed(2)}</td>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td><strong>Total Weight:</strong></td>
+                                    <td><strong>${totalWeight} kg</strong></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            `;
+            
+            container.innerHTML = html;
+        }
+        
+        function generateStockList(configurator) {
+            const container = document.getElementById('stock-content');
+            const quantity = parseInt(document.getElementById('quantity').value);
+            const bom = configurator.generateBOM();
+            
+            let html = `
+                <div class="stock-list">
+                    <h3><i class="fas fa-shapes"></i> Profiles</h3>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Quantity (PU)</th>
+                                <th>Number</th>
+                                <th>Description</th>
+                                <th>Color</th>
+                                <th>Stock</th>
+                                <th>Order</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            
+            // Add profiles to stock list
+            const profileStock = {};
+            
+            bom.profiles.forEach(profile => {
+                if (!profileStock[profile.code]) {
+                    profileStock[profile.code] = {
+                        quantity: 0,
+                        length: profile.length,
+                        description: getProfileDescription(profile.code)
+                    };
+                }
+                
+                profileStock[profile.code].quantity += profile.quantity;
+            });
+            
+            for (const code in profileStock) {
+                const profile = profileStock[code];
+                // Calculate packaging unit (PU) - assume 6.5m per stock piece
+                const stockLength = 6500;
+                const requiredLength = profile.quantity * profile.length * quantity;
+                const requiredPieces = Math.ceil(requiredLength / stockLength);
+                
+                html += `
+                    <tr>
+                        <td>${requiredPieces} x 6.5 m (${(requiredPieces * 6.5).toFixed(1)})</td>
+                        <td>${code}</td>
+                        <td>${profile.description}</td>
+                        <td>${configurator.colorType} ${configurator.colorCode}</td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                `;
+            }
+            
+            // Add glazing beads based on glass thickness
+            const glazingBeadCode = configurator.glassThickness === 28 ? 'COR-2015' : 
+                                    configurator.glassThickness === 38 ? 'COR-2065' : 'COR-2117';
+            const glazingBeadDesc = configurator.glassThickness === 28 ? 'Straight glazing bead clip 28mm (6mm+6mm)' : 
+                                    configurator.glassThickness === 38 ? 'Straight glazing bead clip 38mm (8mm+10mm)' : 
+                                    'Straight glazing bead clip 32mm (8mm+8mm)';
+            
+            // Calculate total glazing bead length needed
+            const glassPanels = configurator.getGlassDimensions();
+            let totalGlazingBeadLength = 0;
+            
+            glassPanels.forEach(panel => {
+                totalGlazingBeadLength += (panel.width + panel.height) * 2;
+            });
+            
+            // Calculate how many stock pieces are needed (6.5m per piece)
+            const glazingBeadPieces = Math.ceil((totalGlazingBeadLength * quantity) / 6500);
+            
+            html += `
+                <tr>
+                    <td>${glazingBeadPieces} x 6.5 m (${(glazingBeadPieces * 6.5).toFixed(1)})</td>
+                    <td>${glazingBeadCode}</td>
+                    <td>${glazingBeadDesc}</td>
+                    <td>${configurator.colorType} ${configurator.colorCode}</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            `;
+            
+            html += `
+                        </tbody>
+                    </table>
+                    
+                    <h3><i class="fas fa-tools"></i> Accessories</h3>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Quantity (PU)</th>
+                                <th>Number</th>
+                                <th>Description</th>
+                                <th>Stock</th>
+                                <th>Order</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            
+            // Add accessories to stock list
+            bom.accessories.forEach(accessory => {
+                const packSize = getAccessoryPackSize(accessory.code);
+                const totalQuantity = accessory.quantity * quantity;
+                const packCount = Math.ceil(totalQuantity / parseInt(packSize));
+                
+                html += `
+                    <tr>
+                        <td>${totalQuantity} pc (${packCount} PU @ ${packSize})</td>
+                        <td>${accessory.code}</td>
+                        <td>${getAccessoryDescription(accessory.code)}</td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                `;
+            });
+            
+            html += `
+                        </tbody>
+                    </table>
+                    
+                    <h3><i class="fas fa-grip-lines"></i> Gaskets</h3>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Quantity (PU)</th>
+                                <th>Number</th>
+                                <th>Description</th>
+                                <th>Color</th>
+                                <th>Stock</th>
+                                <th>Order</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            
+            // Add gaskets to stock list
+            bom.gaskets.forEach(gasket => {
+                const length = ((gasket.length / 1000) * quantity).toFixed(1);
+                const packSize = getGasketPackSize(gasket.code);
+                const packCount = Math.ceil((gasket.length / 1000 * quantity) / parseInt(packSize));
+                
+                html += `
+                    <tr>
+                        <td>${length} m (${packCount} PU @ ${packSize})</td>
+                        <td>${gasket.code}</td>
+                        <td>${getGasketDescription(gasket.code)}</td>
+                        <td>${gasket.color}</td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                `;
+            });
+            
+            html += `
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            
+            container.innerHTML = html;
+        }
+        
+        function generateCutOptimization(configurator) {
+            const container = document.getElementById('cut-content');
+            const quantity = parseInt(document.getElementById('quantity').value);
+            const bom = configurator.generateBOM();
+            
+            let html = `
+                <div class="cut-optimization">
+                    <div class="cut-header">
+                        <p><strong>Position:</strong> ${configurator.positionCode}</p>
+                        <p><strong>Quantity:</strong> ${quantity}</p>
+                        <p><strong>Included Positions:</strong> ${configurator.positionCode}</p>
+                        <p><strong>Cutting and angle data comply with settings of saw Without Output File.</strong></p>
+                    </div>
+                    
+                    <h3><i class="fas fa-ruler-combined"></i> Cortizo 7635 - Frame for fixed MP70</h3>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th colspan="3">Cortizo 7635</th>   
+                                <th colspan="2">Frame for fixed MP70</th>
+                            </tr>
+                            <tr>
+                                <th colspan="3">${Math.ceil(bom.profiles.filter(p => p.code === 'Cor-7635' || p.code === 'Cor-7635' || p.code === 'Cor-7635' || p.code === 'Cor-7635').length * quantity / 2)} Pcs. @ 6,500 mm</th>
+                                <th colspan="2">Color: ${configurator.colorType} ${configurator.colorCode}</th>
+                            </tr>
+                            <tr>
+                                <th>Quantity</th>
+                                <th>Cutting Length</th>
+                                <th>Length</th>
+                                <th>Cut</th>
+                                <th>Tests</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${generateCutRows(bom.profiles.filter(p => p.code === 'Cor-7635' || p.code === 'Cor-7635' || p.code === 'Cor-7635' || p.code === 'Cor-7635'), quantity)}
+                        </tbody>
+                    </table>
+                    
+                    ${bom.profiles.some(p => p.code === 'Cor-7670' || p.code === 'Cor-7670') ? `
+                    <h3><i class="fas fa-ruler-combined"></i> Cortizo 7670 - Fixed door transom MP70</h3>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th colspan="3">Cortizo 7670</th>
+                                <th colspan="2">Fixed door transom MP70</th>
+                            </tr>
+                            <tr>
+                                <th colspan="3">${Math.ceil(bom.profiles.filter(p => p.code === 'Cor-7670' || p.code === 'Cor-7670').length * quantity / 2)} Pcs. @ 6,500 mm</th>
+                                <th colspan="2">Color: ${configurator.colorType} ${configurator.colorCode}</th>
+                            </tr>
+                            <tr>
+                                <th>Quantity</th>
+                                <th>Cutting Length</th>
+                                <th>Length</th>
+                                <th>Cut</th>
+                                <th>Tests</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${generateCutRows(bom.profiles.filter(p => p.code === 'Cor-7670' || p.code === 'Cor-7670'), quantity)}
+                        </tbody>
+                    </table>
+                    ` : ''}
+                    
+                    <h3><i class="fas fa-glass-martini-alt"></i> Glazing Bead</h3>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th colspan="3">${configurator.glassThickness === 28 ? 'Cortizo 2015' : configurator.glassThickness === 38 ? 'Cortizo 2065' : 'Cortizo 2117'}</th>
+                                <th colspan="2">Straight glazing bead for ${configurator.glassThickness}mm</th>
+                            </tr>
+                            <tr>
+                                <th colspan="3">${4 * quantity} Pcs. @ 6,500 mm</th>
+                                <th colspan="2">Color: ${configurator.colorType} ${configurator.colorCode}</th>
+                            </tr>
+                            <tr>
+                                <th>Quantity</th>
+                                <th>Cutting Length</th>
+                                <th>Length</th>
+                                <th>Cut</th>
+                                <th>Tests</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>${quantity * 2} x</td>
+                                <td>${Math.ceil(configurator.width - 55.8)}</td>
+                                <td>${Math.ceil(configurator.width - 55.8)}</td>
+                                <td>90° / 90°</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>${quantity * 2} x</td>
+                                <td>${Math.ceil(configurator.height - 55.8)}</td>
+                                <td>${Math.ceil(configurator.height - 55.8)}</td>
+                                <td>90° / 90°</td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            
+            container.innerHTML = html;
+        }
+        
+        function generateCutRows(profiles, quantity) {
+            let rows = '';
+            
+            profiles.forEach(profile => {
+                rows += `
+                    <tr>
+                        <td>${profile.quantity * quantity} x</td>
+                        <td>${profile.length}</td>
+                        <td>${profile.length}</td>
+                        <td>${profile.type.includes('frame') ? '45° / 45°' : '90° / 90°'}</td>
+                        <td></td>
+                    </tr>
+                `;
+            });
+            
+            return rows;
+        }
+        
+        function getProfileDescription(code) {
+            const descriptions = {
+                'Cor-7635': 'Frame for fixed MP70 (Top)',
+                'Cor-7635': 'Frame for fixed MP70 (Right)',
+                'Cor-7635': 'Frame for fixed MP70 (Bottom)',
+                'Cor-7635': 'Frame for fixed MP70 (Left)',
+                'Cor-7670': 'Fixed door transom MP70',
+                'Cor-7670': 'Fixed door mullion MP70'
+            };
+            
+            return descriptions[code] || code;
+        }
+        
+        function getGasketDescription(code) {
+            const descriptions = {
+                '240124': 'Glazing outer gasket 3.6mm',
+                '250097': 'Glazing balloon gasket 7mm',
+                '307000': 'Insulating foam of 35mm x 10mm'
+            };
+            
+            return descriptions[code] || code;
+        }
+        
+        function getAccessoryDescription(code) {
+            const descriptions = {
+              
+                '287310': 'Alignment cleat',
+                '920380': 'Square teton cleat',
+                '317121': 'Sash glazing wedge',
+                '292243': 'Transom block'
+            };
+            
+            return descriptions[code] || code;
+        }
+        
+        function getAccessoryPackSize(code) {
+            const packSizes = {
+                '287310': '25',
+                '920380': '25',
+                '317121': '100',
+                '292243': '20'
+            };
+            
+            return packSizes[code] || '10';
+        }
+        
+        function getGasketPackSize(code) {
+            const packSizes = {
+                '240124': '200',
+                '250097': '100',
+                '307000': '240'
+            };
+            
+            return packSizes[code] || '100';
+        }
+        
+        // Custom Save Dialog CSS - Add this to your CSS file or in a style tag in your HTML
+function addSaveDialogStyles() {
+    // Check if styles already exist
+    if (document.getElementById('save-dialog-styles')) {
+        return;
+    }
+    
+    const styleElement = document.createElement('style');
+    styleElement.id = 'save-dialog-styles';
+    styleElement.textContent = `
+        .save-dialog-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .save-dialog-container {
+            background: linear-gradient(135deg, #2980b9, #1a5276);
+            color: white;
+            border-radius: 10px;
+            width: 500px;
+            max-width: 90%;
+            box-shadow: 0 5px 30px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            animation: dialogFadeIn 0.3s ease-out;
+        }
+        
+        @keyframes dialogFadeIn {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .save-dialog-header {
+            background: linear-gradient(90deg, #3498db, #2980b9);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .save-dialog-header h2 {
+            margin: 0;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .save-dialog-header h2 i {
+            margin-right: 10px;
+        }
+        
+        .save-dialog-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            opacity: 0.8;
+            transition: opacity 0.2s;
+        }
+        
+        .save-dialog-close:hover {
+            opacity: 1;
+        }
+        
+        .save-dialog-body {
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.95);
+            color: #333;
+        }
+        
+        .save-dialog-row {
+            margin-bottom: 15px;
+        }
+        
+        .save-dialog-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .save-dialog-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            box-sizing: border-box;
+            transition: border-color 0.2s;
+        }
+        
+        .save-dialog-input:focus {
+            border-color: #3498db;
+            outline: none;
+            box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
+        }
+        
+        .save-dialog-preview {
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .save-dialog-preview-icon {
+            background-color: #e74c3c;
+            color: white;
+            padding: 8px;
+            border-radius: 5px;
+            margin-right: 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .save-dialog-preview-info {
+            flex: 1;
+        }
+        
+        .save-dialog-preview-title {
+            font-weight: bold;
+            margin-bottom: 3px;
+        }
+        
+        .save-dialog-preview-meta {
+            font-size: 12px;
+            color: #7f8c8d;
+        }
+        
+        .save-dialog-footer {
+            padding: 15px 20px;
+            background-color: #f4f6f8;
+            border-top: 1px solid #eee;
+            text-align: right;
+        }
+        
+        .save-dialog-btn {
+            padding: 8px 16px;
+            border-radius: 5px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            margin-left: 10px;
+        }
+        
+        .save-dialog-btn-cancel {
+            background-color: #95a5a6;
+            color: white;
+        }
+        
+        .save-dialog-btn-cancel:hover {
+            background-color: #7f8c8d;
+        }
+        
+        .save-dialog-btn-save {
+            background-color: #2ecc71;
+            color: white;
+        }
+        
+        .save-dialog-btn-save:hover {
+            background-color: #27ae60;
+        }
+        
+        .save-dialog-options {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+        
+        .save-dialog-option {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            flex: 1;
+            margin: 0 5px;
+            transition: all 0.2s;
+        }
+        
+        .save-dialog-option:hover {
+            border-color: #3498db;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .save-dialog-option.active {
+            border-color: #3498db;
+            background-color: rgba(52, 152, 219, 0.1);
+        }
+        
+        .save-dialog-option i {
+            font-size: 24px;
+            margin-bottom: 5px;
+            color: #3498db;
+        }
+        
+        .save-dialog-option-label {
+            display: block;
+            font-size: 12px;
+            font-weight: bold;
+        }
+    `;
+    
+    document.head.appendChild(styleElement);
+}
+
+// Custom Save Dialog HTML
+function createSaveDialog(config, pdfBlob) {
+    addSaveDialogStyles();
+    
+    const overlay = document.createElement('div');
+    overlay.className = 'save-dialog-overlay';
+    
+    const dialogSize = formatBytes(pdfBlob.size);
+    const dialogDate = new Date().toLocaleDateString();
+    const filename = `MP70_Fixed_${config.windowType}_${config.width}x${config.height}_Qty${config.quantity}.pdf`;
+    
+    overlay.innerHTML = `
+        <div class="save-dialog-container">
+            <div class="save-dialog-header">
+                <h2><i class="fas fa-file-pdf"></i> Save PDF Document</h2>
+                <button class="save-dialog-close">&times;</button>
+            </div>
+            <div class="save-dialog-body">
+                <div class="save-dialog-preview">
+                    <div class="save-dialog-preview-icon">
+                        <i class="fas fa-file-pdf"></i>
+                    </div>
+                    <div class="save-dialog-preview-info">
+                        <div class="save-dialog-preview-title">${filename}</div>
+                        <div class="save-dialog-preview-meta">PDF Document · ${dialogSize} · Created ${dialogDate}</div>
+                    </div>
+                </div>
+                
+                <div class="save-dialog-options">
+                    <div class="save-dialog-option active" data-format="pdf">
+                        <i class="fas fa-file-pdf"></i>
+                        <span class="save-dialog-option-label">PDF Format</span>
+                    </div>
+                    <div class="save-dialog-option" data-format="print">
+                        <i class="fas fa-print"></i>
+                        <span class="save-dialog-option-label">Print Now</span>
+                    </div>
+                </div>
+                
+                <div class="save-dialog-row">
+                    <label class="save-dialog-label" for="save-dialog-filename">Filename</label>
+                    <input type="text" id="save-dialog-filename" class="save-dialog-input" value="${filename}">
+                </div>
+                
+                <div class="save-dialog-row">
+                    <label class="save-dialog-label" for="save-dialog-location">Save to (folder path)</label>
+                    <div style="display: flex;">
+                        <input type="text" id="save-dialog-location" class="save-dialog-input" placeholder="Downloads" disabled style="flex: 1; margin-right: 10px;">
+                        <button class="save-dialog-btn" style="margin: 0;" disabled>Browse...</button>
+                    </div>
+                    <small style="color: #7f8c8d; margin-top: 5px; display: block;">
+                        Note: For security reasons, browsers cannot directly access your file system. 
+                        Files are saved to your default Downloads folder.
+                    </small>
+                </div>
+            </div>
+            <div class="save-dialog-footer">
+                <button class="save-dialog-btn save-dialog-btn-cancel">Cancel</button>
+                <button class="save-dialog-btn save-dialog-btn-save">Save PDF</button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(overlay);
+    
+    // Add event listeners
+    const closeButton = overlay.querySelector('.save-dialog-close');
+    const cancelButton = overlay.querySelector('.save-dialog-btn-cancel');
+    const saveButton = overlay.querySelector('.save-dialog-btn-save');
+    const filenameInput = overlay.querySelector('#save-dialog-filename');
+    const formatOptions = overlay.querySelectorAll('.save-dialog-option');
+    
+    // Close dialog
+    closeButton.addEventListener('click', () => {
+        document.body.removeChild(overlay);
+    });
+    
+    cancelButton.addEventListener('click', () => {
+        document.body.removeChild(overlay);
+    });
+    
+    // Format options
+    formatOptions.forEach(option => {
+        option.addEventListener('click', () => {
+            // Remove active class from all options
+            formatOptions.forEach(opt => opt.classList.remove('active'));
+            // Add active class to clicked option
+            option.classList.add('active');
+            
+            const format = option.getAttribute('data-format');
+            if (format === 'print') {
+                filenameInput.disabled = true;
+            } else {
+                filenameInput.disabled = false;
+            }
+        });
+    });
+    
+    // Save button
+    saveButton.addEventListener('click', () => {
+        const activeFormat = overlay.querySelector('.save-dialog-option.active').getAttribute('data-format');
+        const customFilename = filenameInput.value.trim() || filename;
+        
+        if (activeFormat === 'print') {
+            // Handle print option
+            const pdfUrl = URL.createObjectURL(pdfBlob);
+            const printWindow = window.open(pdfUrl);
+            printWindow.onload = function() {
+                printWindow.print();
+                setTimeout(() => URL.revokeObjectURL(pdfUrl), 100);
+            };
+        } else {
+            // Handle save option
+            const url = URL.createObjectURL(pdfBlob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = customFilename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            setTimeout(() => URL.revokeObjectURL(url), 100);
+        }
+        
+        document.body.removeChild(overlay);
+        showStatusMessage("PDF processed successfully!", "success");
+    });
+    
+    // Make the dialog draggable (optional)
+    makeDraggable(overlay.querySelector('.save-dialog-container'), overlay.querySelector('.save-dialog-header'));
+}
+
+// Helper function to format file sizes
+function formatBytes(bytes, decimals = 2) {
+    if (bytes === 0) return '0 Bytes';
+    
+    const k = 1024;
+    const dm = decimals < 0 ? 0 : decimals;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+    
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+}
+
+// Make an element draggable
+function makeDraggable(element, handle) {
+    let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+    
+    handle.style.cursor = 'move';
+    handle.onmousedown = dragMouseDown;
+    
+    function dragMouseDown(e) {
+        e.preventDefault();
+        // Get the mouse cursor position at startup
+        pos3 = e.clientX;
+        pos4 = e.clientY;
+        document.onmouseup = closeDragElement;
+        // Call a function whenever the cursor moves
+        document.onmousemove = elementDrag;
+    }
+    
+    function elementDrag(e) {
+        e.preventDefault();
+        // Calculate the new cursor position
+        pos1 = pos3 - e.clientX;
+        pos2 = pos4 - e.clientY;
+        pos3 = e.clientX;
+        pos4 = e.clientY;
+        // Set the element's new position
+        element.style.top = (element.offsetTop - pos2) + "px";
+        element.style.left = (element.offsetLeft - pos1) + "px";
+    }
+    
+    function closeDragElement() {
+        // Stop moving when mouse button is released
+        document.onmouseup = null;
+        document.onmousemove = null;
+    }
+}
+
+// Updated exportToPDF function to use the custom save dialog
+function exportToPDF() {
+    try {
+        showStatusMessage("Generating PDF...");
+        
+        // Get the configuration
+        const config = collectConfiguration();
+        
+        // Create a new jsPDF instance
+        const doc = new jsPDF();
+        
+        // Add title
+        doc.setFontSize(16);
+        doc.text("MP70 Fixed Window Configuration", 14, 15);
+        
+        // Add current date
+        const now = new Date();
+        doc.setFontSize(10);
+        doc.text(`Generated: ${now.toLocaleDateString()} ${now.toLocaleTimeString()}`, 14, 22);
+        
+        // Add configuration details
+        doc.setFontSize(12);
+        doc.text("Configuration Details:", 14, 30);
+        
+        doc.setFontSize(10);
+        doc.text(`Position Code: ${config.positionCode}`, 14, 37);
+        doc.text(`Window Type: ${config.windowType}`, 14, 42);
+        doc.text(`Dimensions: ${config.width} × ${config.height} mm`, 14, 47);
+        doc.text(`Quantity: ${config.quantity}`, 14, 52);
+        doc.text(`Glass Thickness: ${config.glassThickness} mm`, 14, 57);
+        doc.text(`Color: ${config.colorType} ${config.colorCode}`, 14, 62);
+        doc.text(`Total Weight: ${calculateTotalWeight()} kg`, 14, 67);
+        
+        // Draw window preview directly on the PDF
+        addWindowPreviewDirectly(doc, config, 80);
+        
+        // Get the active tab content for tables
+        const activeTab = document.querySelector('.tab-btn.active').getAttribute('data-tab');
+        const activeTabContent = document.getElementById(`${activeTab}-tab`);
+        
+        // Add a page break after the preview
+        doc.addPage();
+        
+        // Start position for the first table
+        let yPos = 20;
+        doc.setFontSize(14);
+        doc.text("Assembly List", 14, yPos);
+        yPos += 10;
+        
+        // Find tables in the active tab
+        const tables = activeTabContent.querySelectorAll('.data-table');
+        
+        // Convert tables to jsPDF autotable
+        tables.forEach((table, index) => {
+            // Get the preceding h3 heading as the table title
+            let tableTitle = "Table";
+            const prevHeading = table.previousElementSibling;
+            if (prevHeading && prevHeading.tagName === 'H3') {
+                tableTitle = prevHeading.textContent.trim();
+            }
+            
+            // Extract table data
+            const headers = [];
+            const rows = [];
+            
+            // Get headers
+            table.querySelectorAll('thead th').forEach(th => {
+                if (!th.hasAttribute('colspan')) {
+                    headers.push(th.textContent);
+                }
+            });
+            
+            // Get rows
+            table.querySelectorAll('tbody tr').forEach(tr => {
+                const rowData = [];
+                tr.querySelectorAll('td').forEach(td => {
+                    rowData.push(td.textContent);
+                });
+                rows.push(rowData);
+            });
+            
+            // Get footer rows if they exist
+            const footerRows = [];
+            table.querySelectorAll('tfoot tr').forEach(tr => {
+                const rowData = [];
+                tr.querySelectorAll('td').forEach(td => {
+                    rowData.push(td.textContent);
+                });
+                footerRows.push(rowData);
+            });
+            
+            // If there are rows, add the table to the PDF
+            if (rows.length > 0) {
+                // Add table title
+                doc.setFontSize(12);
+                doc.text(tableTitle, 14, yPos);
+                
+                // Add some space after the title
+                yPos += 5;
+                
+                // Check if we need a new page for this table
+                if (yPos > 240) {
+                    doc.addPage();
+                    yPos = 20;
+                }
+                
+                // Generate the table
+                doc.autoTable({
+                    head: [headers],
+                    body: rows,
+                    foot: footerRows.length > 0 ? footerRows : undefined,
+                    startY: yPos,
+                    theme: 'grid',
+                    headStyles: {
+                        fillColor: [0, 86, 179],
+                        textColor: 255,
+                        fontStyle: 'bold'
+                    },
+                    footStyles: {
+                        fillColor: [220, 220, 220],
+                        fontStyle: 'bold'
+                    },
+                    alternateRowStyles: {
+                        fillColor: [240, 240, 240]
+                    },
+                    margin: { top: 20 }
+                });
+                
+                // Update yPos for the next table
+                yPos = doc.lastAutoTable.finalY + 15;
+                
+                // Add a new page if we're at the bottom or for a new table
+                if (yPos > 270 && index < tables.length - 1) {
+                    doc.addPage();
+                    yPos = 20;
+                }
+            }
+        });
+        
+        // Get the PDF as a blob
+        const pdfBlob = doc.output('blob');
+        
+        // Show the custom save dialog
+        createSaveDialog(config, pdfBlob);
+        
+    } catch (error) {
+        console.error('Error generating PDF:', error);
+        showStatusMessage("Error generating PDF: " + error.message, "error");
+    }
+}
+        
+        function addWindowPreviewDirectly(doc, config, startY) {
+            // Add window preview title
+            doc.setFontSize(12);
+            doc.text("Window Preview:", 14, startY);
+            startY += 10;
+            
+            const windowType = config.windowType;
+            const width = config.width;
+            const height = config.height;
+            
+            // Scale to fit on PDF page
+            const pdfWidth = 180;
+            const maxHeight = 120;
+            
+            // Calculate aspect ratio and scaled dimensions
+            const aspectRatio = width / height;
+            let drawWidth, drawHeight;
+            
+            if (aspectRatio > 1) {
+                // Wider than tall
+                drawWidth = pdfWidth;
+                drawHeight = pdfWidth / aspectRatio;
+            } else {
+                // Taller than wide or square
+                drawHeight = maxHeight;
+                drawWidth = maxHeight * aspectRatio;
+            }
+            
+            // Center position on page
+            const xPos = (210 - drawWidth) / 2; // PDF width is 210mm
+            
+            // Draw the frame rectangle
+            doc.setDrawColor(0);
+            doc.setFillColor(224, 224, 224); // #E0E0E0
+            doc.rect(xPos, startY, drawWidth, drawHeight, 'FD'); // Filled with border
+            
+            // Calculate the frame width in the scaled drawing
+            const frameWidth = 70; // actual frame width in mm
+            const scaleFactor = drawWidth / width; // scale factor to convert to PDF coordinates
+            const scaledFrameWidth = frameWidth * scaleFactor;
+            
+            // Draw the inner frame
+            doc.setFillColor(208, 240, 255); // #D0F0FF
+            doc.rect(
+                xPos + scaledFrameWidth, 
+                startY + scaledFrameWidth, 
+                drawWidth - scaledFrameWidth * 2, 
+                drawHeight - scaledFrameWidth * 2, 
+                'FD'
+            );
+            
+            // Draw mullions/transoms based on window type
+            doc.setDrawColor(0);
+            doc.setLineWidth(0.5);
+            
+            switch (windowType) {
+                case 'F2H': // Horizontal transom
+                    {
+                        const transom_y = startY + drawHeight / 2;
+                        doc.line(
+                            xPos + scaledFrameWidth, 
+                            transom_y, 
+                            xPos + drawWidth - scaledFrameWidth, 
+                            transom_y
+                        );
+                    }
+                    break;
+                    
+                case 'F2V': // Vertical mullion
+                    {
+                        const mullion_x = xPos + drawWidth / 2;
+                        doc.line(
+                            mullion_x, 
+                            startY + scaledFrameWidth, 
+                            mullion_x, 
+                            startY + drawHeight - scaledFrameWidth
+                        );
+                    }
+                    break;
+                    
+                case 'F4': // Cross configuration
+                    {
+                        const cross_x = xPos + drawWidth / 2;
+                        const cross_y = startY + drawHeight / 2;
+                        doc.line(
+                            xPos + scaledFrameWidth, 
+                            cross_y, 
+                            xPos + drawWidth - scaledFrameWidth, 
+                            cross_y
+                        );
+                        doc.line(
+                            cross_x, 
+                            startY + scaledFrameWidth, 
+                            cross_x, 
+                            startY + drawHeight - scaledFrameWidth
+                        );
+                    }
+                    break;
+                    
+                case 'F3H': // Two horizontal transoms
+                    {
+                        const h1 = startY + drawHeight / 3;
+                        const h2 = startY + (drawHeight / 3) * 2;
+                        doc.line(
+                            xPos + scaledFrameWidth, 
+                            h1, 
+                            xPos + drawWidth - scaledFrameWidth, 
+                            h1
+                        );
+                        doc.line(
+                            xPos + scaledFrameWidth, 
+                            h2, 
+                            xPos + drawWidth - scaledFrameWidth, 
+                            h2
+                        );
+                    }
+                    break;
+                    
+                case 'F3V': // Two vertical mullions
+                    {
+                        const v1 = xPos + drawWidth / 3;
+                        const v2 = xPos + (drawWidth / 3) * 2;
+                        doc.line(
+                            v1, 
+                            startY + scaledFrameWidth, 
+                            v1, 
+                            startY + drawHeight - scaledFrameWidth
+                        );
+                        doc.line(
+                            v2, 
+                            startY + scaledFrameWidth, 
+                            v2, 
+                            startY + drawHeight - scaledFrameWidth
+                        );
+                    }
+                    break;
+            }
+            
+            // Add dimensions as text beneath the drawing
+            doc.setFontSize(10);
+            const dimensionsY = startY + drawHeight + 10;
+            doc.text(`Width: ${width} mm | Height: ${height} mm | Type: ${windowType}`, xPos, dimensionsY);
+        }
+        
+        function generateAssemblyList(configurator) {
+            const container = document.getElementById('assembly-content');
+            
+            // Generate the HTML for assembly list using the formulas from mp70_fix_formulas.js
+            const bom = configurator.generateBOM();
+            const glassDimensions = configurator.getGlassDimensions();
+            const windowType = document.getElementById('window-type').value;
+            const width = parseInt(document.getElementById('width').value);
+            const height = parseInt(document.getElementById('height').value);
+            const quantity = parseInt(document.getElementById('quantity').value);
+            const totalWeight = calculateTotalWeight();
+            
+            // Get the window preview SVG
+            const windowPreview = generateWindowSVG(windowType, width, height);
+            
+            let html = `
+                <div class="assembly-list">
+                    <div class="window-preview-section">
+                        <h3><i class="fas fa-eye"></i> Window Preview</h3>
+                        <div class="window-preview-container">
+                            ${windowPreview}
+                        </div>
+                        <div class="preview-details">
+                            <p><strong>Width:</strong> ${width} mm</p>
+                            <p><strong>Height:</strong> ${height} mm</p>
+                            <p><strong>Type:</strong> ${windowType}</p>
+                            <p><strong>Quantity:</strong> ${quantity}</p>
+                            <p><strong>Total Weight:</strong> ${totalWeight} kg</p>
+                        </div>
+                    </div>
+                    
+                    <div class="assembly-details-section">
+                        <div class="assembly-header">
+                            <div class="assembly-info">
+                                <p><strong>Position:</strong> ${configurator.positionCode}</p>
+                                <p><strong>Size:</strong> ${configurator.width} x ${configurator.height} mm</p>
+                                <p><strong>Quantity:</strong> ${quantity}</p>
+                                <p><strong>System:</strong> Cortizo Millennium Plus 70 Fixed</p>
+                                <p><strong>Color:</strong> ${configurator.colorType} ${configurator.colorCode}</p>
+                                <p><strong>Total Weight:</strong> ${totalWeight} kg</p>
+                            </div>
+                        </div>
+                        
+                        <h3><i class="fas fa-border-all"></i> Frame Element</h3>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Quantity</th>
+                                    <th>Number</th>
+                                    <th>Description</th>
+                                    <th>Length (mm)</th>
+                                    <th>Cut</th>
+                                    <th>Orientation</th>
+                                    <th>Weight (kg)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+            `;
+            
+            // Add profiles
+            let totalProfileWeight = 0;
+            bom.profiles.forEach(profile => {
+                const isFrame = profile.type.includes('frame');
+                const profileWeight = isFrame ? 
+                    (profile.length / 1000 * 1.44 * quantity) : 
+                    (profile.length / 1000 * 2.284 * quantity);
+                    
+                totalProfileWeight += profileWeight;
+                
+                html += `
+                    <tr>
+                        <td>${profile.quantity * quantity} Pcs.</td>
+                        <td>${profile.code}</td>
+                        <td>${getProfileDescription(profile.code)}</td>
+                        <td>${profile.length}</td>
+                        <td>${isFrame ? '45° - 45°' : '90° - 90°'}</td>
+                        <td>${profile.type.includes('top') ? 'T' : 
+                             profile.type.includes('bottom') ? 'B' : 
+                             profile.type.includes('left') ? 'L' : 
+                             profile.type.includes('right') ? 'R' :
+                             profile.type.includes('transom') ? 'H' : 'V'}</td>
+                        <td>${profileWeight.toFixed(2)}</td>
+                    </tr>
+                `;
+            });
+            
+            html += `
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="6" style="text-align: right;"><strong>Total Frame Weight:</strong></td>
+                                    <td>${totalProfileWeight.toFixed(2)} kg</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                        
+                        <h3><i class="fas fa-square"></i> Glass</h3>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Quantity</th>
+                                    <th>Width (mm)</th>
+                                    <th>Height (mm)</th>
+                                    <th>Area (m²)</th>
+                                    <th>Description</th>
+                                    <th>Weight (kg)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+            `;
+            
+            // Add glass panels
+            let totalGlassWeight = 0;
+            const glassWeights = {
+                '28': 30, // 6mm+6mm (approx. 15kg/m² per pane)
+                '32': 40, // 8mm+8mm (approx. 20kg/m² per pane)
+                '38': 45  // 8mm+10mm (approx. 20kg/m² + 25kg/m²)
+            };
+            
+            glassDimensions.forEach(glass => {
+                const area = ((glass.width * glass.height) / 1000000).toFixed(2);
+                const glassWeight = area * glassWeights[configurator.glassThickness.toString()] * quantity;
+                totalGlassWeight += parseFloat(glassWeight.toFixed(2));
+                
+                const glassDesc = configurator.glassThickness === 28 ? '28mm (6mm+6mm)' : 
+                                  configurator.glassThickness === 32 ? '32mm (8mm+8mm)' : 
+                                  '38mm (8mm+10mm)';
+                
+                html += `
+                    <tr>
+                        <td>${quantity} Pcs.</td>
+                        <td>${glass.width}</td>
+                        <td>${glass.height}</td>
+                        <td>${area}</td>
+                        <td>${glassDesc}</td>
+                        <td>${glassWeight.toFixed(2)}</td>
+                    </tr>
+                `;
+            });
+            
+            html += `
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="5" style="text-align: right;"><strong>Total Glass Weight:</strong></td>
+                                    <td>${totalGlassWeight.toFixed(2)} kg</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                        
+                        <h3><i class="fas fa-border-none"></i> Glazing Bead</h3>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Quantity</th>
+                                    <th>Number</th>
+                                    <th>Description</th>
+                                    <th>Length (mm)</th>
+                                    <th>Cut</th>
+                                    <th>Color</th>
+                                    <th>Weight (kg)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+            `;
+            
+            // Add glazing beads based on glass thickness
+            const glazingBeadCode = configurator.glassThickness === 28 ? 'COR-2015' : 
+                                 configurator.glassThickness === 38 ? 'COR-2065' : 'COR-2117';
+            
+            const glazingBeadWeight = {
+                '28': 0.321, // COR-2015
+                '32': 0.294, // COR-2117
+                '38': 0.270  // COR-2065
+            };
+            
+            let totalHorizontalLength = 0;
+            let totalVerticalLength = 0;
+            let totalGlazingBeadWeight = 0;
+            
+            glassDimensions.forEach(glass => {
+                totalHorizontalLength += glass.width-68 * 2;
+                totalVerticalLength += glass.height-68 * 2;
+            });
+            
+            const horizontalLength = Math.ceil(totalHorizontalLength / glassDimensions.length / 2);
+            const verticalLength = Math.ceil(totalVerticalLength / glassDimensions.length / 2);
+            
+            const horizontalGlazingWeight = (horizontalLength / 1000) * 
+                glazingBeadWeight[configurator.glassThickness.toString()] * 
+                glassDimensions.length * 2 * quantity;
+                
+            const verticalGlazingWeight = (verticalLength / 1000) * 
+                glazingBeadWeight[configurator.glassThickness.toString()] * 
+                glassDimensions.length * 2 * quantity;
+                
+            totalGlazingBeadWeight = horizontalGlazingWeight + verticalGlazingWeight;
+            
+            html += `
+                <tr>
+                    <td>${glassDimensions.length * 2 * quantity} Pcs.</td>
+                    <td>${glazingBeadCode}</td>
+                    <td>Straight glazing bead for ${configurator.glassThickness}mm</td>
+                    <td>${horizontalLength}</td>
+                    <td>90° - 90°</td>
+                    <td>${configurator.colorType} ${configurator.colorCode}</td>
+                    <td>${horizontalGlazingWeight.toFixed(2)}</td>
+                </tr>
+                <tr>
+                    <td>${glassDimensions.length * 2 * quantity} Pcs.</td>
+                    <td>${glazingBeadCode}</td>
+                    <td>Straight glazing bead for ${configurator.glassThickness}mm</td>
+                    <td>${verticalLength}</td>
+                    <td>90° - 90°</td>
+                    <td>${configurator.colorType} ${configurator.colorCode}</td>
+                    <td>${verticalGlazingWeight.toFixed(2)}</td>
+                </tr>
+            `;
+            
+            html += `
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="6" style="text-align: right;"><strong>Total Glazing Bead Weight:</strong></td>
+                                    <td>${totalGlazingBeadWeight.toFixed(2)} kg</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                        
+                        <h3><i class="fas fa-grip-lines"></i> Gaskets</h3>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Quantity</th>
+                                    <th>Number</th>
+                                    <th>Description</th>
+                                    <th>Color</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+            `;
+            
+            // Add gaskets
+            bom.gaskets.forEach(gasket => {
+                html += `
+                    <tr>
+                        <td>${((gasket.length / 1000) * quantity).toFixed(2)} m</td>
+                        <td>${gasket.code}</td>
+                        <td>${getGasketDescription(gasket.code)}</td>
+                        <td>${gasket.color}</td>
+                    </tr>
+                `;
+            });
+            
+            html += `
+                            </tbody>
+                        </table>
+                        
+                        <h3><i class="fas fa-screwdriver"></i> Accessories</h3>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Quantity</th>
+                                    <th>Number</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+            `;
+            
+            // Add accessories
+            bom.accessories.forEach(accessory => {
+                html += `
+                    <tr>
+                        <td>${accessory.quantity * quantity} pc</td>
+                        <td>${accessory.code}</td>
+                        <td>${getAccessoryDescription(accessory.code)}</td>
+                    </tr>
+                `;
+            });
+            
+            html += `
+                            </tbody>
+                        </table>
+                        
+                        <div class="weight-summary">
+                            <h3><i class="fas fa-weight-hanging"></i> Weight Summary</h3>
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Component</th>
+                                        <th>Weight (kg)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Frame</td>
+                                        <td>${totalProfileWeight.toFixed(2)}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Glass</td>
+                                        <td>${totalGlassWeight.toFixed(2)}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Glazing Bead</td>
+                                        <td>${totalGlazingBeadWeight.toFixed(2)}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Accessories & Hardware (est.)</td>
+                                        <td>${(0.05 * (totalProfileWeight + totalGlassWeight + totalGlazingBeadWeight)).toFixed(2)}</td>
+                                    </tr>
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td><strong>Total Weight:</strong></td>
+                                        <td><strong>${totalWeight} kg</strong></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            container.innerHTML = html;
+            
+            // Add CSS for the new layout
+            const style = document.createElement('style');
+            style.textContent = `
+                .assembly-list {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 20px;
+                }
+                
+                .window-preview-section {
+                    border: 1px solid #ddd;
+                    border-radius: 5px;
+                    padding: 15px;
+                    background-color: #f9f9f9;
+                    margin-bottom: 20px;
+                }
+                
+                .window-preview-container {
+                    display: flex;
+                    justify-content: center;
+                    margin: 15px 0;
+                }
+                
+                .window-preview-container svg {
+                    max-width: 100%;
+                    height: auto;
+                    max-height: 300px;
+                }
+                
+                .preview-details {
+                    display: flex;
+                    flex-wrap: wrap;
+                    justify-content: space-around;
+                    gap: 10px;
+                }
+                
+                .preview-details p {
+                    margin: 5px 15px;
+                }
+                
+                .assembly-details-section {
+                    border: 1px solid #ddd;
+                    border-radius: 5px;
+                    padding: 15px;
+                }
+            `;
+            
+            document.head.appendChild(style);
+        }
+        function addWindowPreviewToPDF(doc, config, startY) {
+            // Add window preview title
+            doc.setFontSize(12);
+            doc.text("Window Preview", 14, startY);
+            startY += 10;
+            
+            // Generate the SVG
+            const windowType = config.windowType;
+            const width = config.width;
+            const height = config.height;
+            const svg = generateWindowSVG(windowType, width, height);
+            
+            // Create a temporary container to render the SVG
+            const container = document.createElement('div');
+            container.innerHTML = svg;
+            document.body.appendChild(container);
+            
+            // Get the SVG element
+            const svgElement = container.querySelector('svg');
+            
+            // Convert SVG to canvas (to be able to add it to PDF)
+            const canvas = document.createElement('canvas');
+            const svgWidth = Math.min(180, svgElement.viewBox.baseVal.width / 10);
+            const svgHeight = Math.min(120, svgElement.viewBox.baseVal.height / 10);
+            canvas.width = svgWidth;
+            canvas.height = svgHeight;
+            
+            const ctx = canvas.getContext('2d');
+            const svgString = new XMLSerializer().serializeToString(svgElement);
+            const img = new Image();
+            
+            // Create a data URL from the SVG
+            const svgBlob = new Blob([svgString], {type: 'image/svg+xml;charset=utf-8'});
+            const DOMURL = window.URL || window.webkitURL || window;
+            const url = DOMURL.createObjectURL(svgBlob);
+            
+            // When the image loads, draw it on the canvas and add to PDF
+            img.onload = function() {
+                ctx.drawImage(img, 0, 0, svgWidth, svgHeight);
+                DOMURL.revokeObjectURL(url);
+                
+                // Add the canvas image to the PDF
+                try {
+                    const imgData = canvas.toDataURL('image/png');
+                    doc.addImage(imgData, 'PNG', 60, startY, svgWidth, svgHeight);
+                    
+                    // Add dimensions as text
+                    doc.setFontSize(10);
+                    const dimensionsY = startY + svgHeight + 10;
+                    doc.text(`Width: ${width} mm | Height: ${height} mm | Type: ${windowType}`, 60, dimensionsY);
+                } catch (e) {
+                    console.error('Error adding image to PDF:', e);
+                    doc.setFontSize(10);
+                    doc.text("Window preview could not be generated", 60, startY + 20);
+                }
+                
+                // Remove the temporary container
+                document.body.removeChild(container);
+            };
+            
+            img.src = url;
+        }
+        
+        function generateAssemblyList(configurator) {
+            const container = document.getElementById('assembly-content');
+            
+            // Generate the HTML for assembly list using the formulas from mp70_fix_formulas.js
+            const bom = configurator.generateBOM();
+            const glassDimensions = configurator.getGlassDimensions();
+            const windowType = document.getElementById('window-type').value;
+            const width = parseInt(document.getElementById('width').value);
+            const height = parseInt(document.getElementById('height').value);
+            const quantity = parseInt(document.getElementById('quantity').value);
+            const totalWeight = calculateTotalWeight();
+            
+            // Get the window preview SVG
+            const windowPreview = generateWindowSVG(windowType, width, height);
+            
+            let html = `
+                <div class="assembly-list">
+                    <div class="window-preview-section">
+                        <h3><i class="fas fa-eye"></i> Window Preview</h3>
+                        <div class="window-preview-container">
+                            ${windowPreview}
+                        </div>
+                        <div class="preview-details">
+                            <p><strong>Width:</strong> ${width} mm</p>
+                            <p><strong>Height:</strong> ${height} mm</p>
+                            <p><strong>Type:</strong> ${windowType}</p>
+                            <p><strong>Quantity:</strong> ${quantity}</p>
+                            <p><strong>Total Weight:</strong> ${totalWeight} kg</p>
+                        </div>
+                    </div>
+                    
+                    <div class="assembly-details-section">
+                        <div class="assembly-header">
+                            <div class="assembly-info">
+                                <p><strong>Position:</strong> ${configurator.positionCode}</p>
+                                <p><strong>Size:</strong> ${configurator.width} x ${configurator.height} mm</p>
+                                <p><strong>Quantity:</strong> ${quantity}</p>
+                                <p><strong>System:</strong> Cortizo Millennium Plus 70 Fixed</p>
+                                <p><strong>Color:</strong> ${configurator.colorType} ${configurator.colorCode}</p>
+                                <p><strong>Total Weight:</strong> ${totalWeight} kg</p>
+                            </div>
+                        </div>
+                        
+                        <h3><i class="fas fa-border-all"></i> Frame Element</h3>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Quantity</th>
+                                    <th>Number</th>
+                                    <th>Description</th>
+                                    <th>Length (mm)</th>
+                                    <th>Cut</th>
+                                    <th>Orientation</th>
+                                    <th>Weight (kg)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+            `;
+            
+            // Add profiles
+            let totalProfileWeight = 0;
+            bom.profiles.forEach(profile => {
+                const isFrame = profile.type.includes('frame');
+                const profileWeight = isFrame ? 
+                    (profile.length / 1000 * 1.44 * quantity) : 
+                    (profile.length / 1000 * 2.284 * quantity);
+                    
+                totalProfileWeight += profileWeight;
+                
+                html += `
+                    <tr>
+                        <td>${profile.quantity * quantity} Pcs.</td>
+                        <td>${profile.code}</td>
+                        <td>${getProfileDescription(profile.code)}</td>
+                        <td>${profile.length}</td>
+                        <td>${isFrame ? '45° - 45°' : '90° - 90°'}</td>
+                        <td>${profile.type.includes('top') ? 'T' : 
+                             profile.type.includes('bottom') ? 'B' : 
+                             profile.type.includes('left') ? 'L' : 
+                             profile.type.includes('right') ? 'R' :
+                             profile.type.includes('transom') ? 'H' : 'V'}</td>
+                        <td>${profileWeight.toFixed(2)}</td>
+                    </tr>
+                `;
+            });
+            
+            html += `
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="6" style="text-align: right;"><strong>Total Frame Weight:</strong></td>
+                                    <td>${totalProfileWeight.toFixed(2)} kg</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                        
+                        <h3><i class="fas fa-square"></i> Glass</h3>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Quantity</th>
+                                    <th>Width (mm)</th>
+                                    <th>Height (mm)</th>
+                                    <th>Area (m²)</th>
+                                    <th>Description</th>
+                                    <th>Weight (kg)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+            `;
+            
+            // Add glass panels
+            let totalGlassWeight = 0;
+            const glassWeights = {
+                '28': 30, // 6mm+6mm (approx. 15kg/m² per pane)
+                '32': 40, // 8mm+8mm (approx. 20kg/m² per pane)
+                '38': 45  // 8mm+10mm (approx. 20kg/m² + 25kg/m²)
+            };
+            
+            glassDimensions.forEach(glass => {
+                const area = ((glass.width * glass.height) / 1000000).toFixed(2);
+                const glassWeight = area * glassWeights[configurator.glassThickness.toString()] * quantity;
+                totalGlassWeight += parseFloat(glassWeight.toFixed(2));
+                
+                const glassDesc = configurator.glassThickness === 28 ? '28mm (6mm+6mm)' : 
+                                  configurator.glassThickness === 32 ? '32mm (8mm+8mm)' : 
+                                  '38mm (8mm+10mm)';
+                
+                html += `
+                    <tr>
+                        <td>${quantity} Pcs.</td>
+                        <td>${glass.width}</td>
+                        <td>${glass.height}</td>
+                        <td>${area}</td>
+                        <td>${glassDesc}</td>
+                        <td>${glassWeight.toFixed(2)}</td>
+                    </tr>
+                `;
+            });
+            
+            html += `
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="5" style="text-align: right;"><strong>Total Glass Weight:</strong></td>
+                                    <td>${totalGlassWeight.toFixed(2)} kg</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                        
+                        <h3><i class="fas fa-border-none"></i> Glazing Bead</h3>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Quantity</th>
+                                    <th>Number</th>
+                                    <th>Description</th>
+                                    <th>Length (mm)</th>
+                                    <th>Cut</th>
+                                    <th>Color</th>
+                                    <th>Weight (kg)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+            `;
+            
+            // Add glazing beads based on glass thickness
+            const glazingBeadCode = configurator.glassThickness === 28 ? 'COR-2015' : 
+                                 configurator.glassThickness === 38 ? 'COR-2065' : 'COR-2117';
+            
+            const glazingBeadWeight = {
+                '28': 0.321, // COR-2015
+                '32': 0.294, // COR-2117
+                '38': 0.270  // COR-2065
+            };
+            
+            let totalHorizontalLength = 0;
+            let totalVerticalLength = 0;
+            let totalGlazingBeadWeight = 0;
+            
+            glassDimensions.forEach(glass => {
+                totalHorizontalLength += glass.width * 2;
+                totalVerticalLength += glass.height * 2;
+            });
+            
+            const horizontalLength = Math.ceil(totalHorizontalLength / glassDimensions.length / 2);
+            const verticalLength = Math.ceil(totalVerticalLength / glassDimensions.length / 2);
+            
+            const horizontalGlazingWeight = (horizontalLength / 1000) * 
+                glazingBeadWeight[configurator.glassThickness.toString()] * 
+                glassDimensions.length * 2 * quantity;
+                
+            const verticalGlazingWeight = (verticalLength / 1000) * 
+                glazingBeadWeight[configurator.glassThickness.toString()] * 
+                glassDimensions.length * 2 * quantity;
+                
+            totalGlazingBeadWeight = horizontalGlazingWeight + verticalGlazingWeight;
+            
+            html += `
+                <tr>
+                    <td>${glassDimensions.length * 2 * quantity} Pcs.</td>
+                    <td>${glazingBeadCode}</td>
+                    <td>Straight glazing bead for ${configurator.glassThickness}mm</td>
+                    <td>${horizontalLength}</td>
+                    <td>90° - 90°</td>
+                    <td>${configurator.colorType} ${configurator.colorCode}</td>
+                    <td>${horizontalGlazingWeight.toFixed(2)}</td>
+                </tr>
+                <tr>
+                    <td>${glassDimensions.length * 2 * quantity} Pcs.</td>
+                    <td>${glazingBeadCode}</td>
+                    <td>Straight glazing bead for ${configurator.glassThickness}mm</td>
+                    <td>${verticalLength}</td>
+                    <td>90° - 90°</td>
+                    <td>${configurator.colorType} ${configurator.colorCode}</td>
+                    <td>${verticalGlazingWeight.toFixed(2)}</td>
+                </tr>
+            `;
+            
+            html += `
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="6" style="text-align: right;"><strong>Total Glazing Bead Weight:</strong></td>
+                                    <td>${totalGlazingBeadWeight.toFixed(2)} kg</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                        
+                        <h3><i class="fas fa-grip-lines"></i> Gaskets</h3>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Quantity</th>
+                                    <th>Number</th>
+                                    <th>Description</th>
+                                    <th>Color</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+            `;
+            
+            // Add gaskets
+            bom.gaskets.forEach(gasket => {
+                html += `
+                    <tr>
+                        <td>${((gasket.length / 1000) * quantity).toFixed(2)} m</td>
+                        <td>${gasket.code}</td>
+                        <td>${getGasketDescription(gasket.code)}</td>
+                        <td>${gasket.color}</td>
+                    </tr>
+                `;
+            });
+            
+            html += `
+                            </tbody>
+                        </table>
+                        
+                        <h3><i class="fas fa-screwdriver"></i> Accessories</h3>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Quantity</th>
+                                    <th>Number</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+            `;
+            
+            // Add accessories
+            bom.accessories.forEach(accessory => {
+                html += `
+                    <tr>
+                        <td>${accessory.quantity * quantity} pc</td>
+                        <td>${accessory.code}</td>
+                        <td>${getAccessoryDescription(accessory.code)}</td>
+                    </tr>
+                `;
+            });
+            
+            html += `
+                            </tbody>
+                        </table>
+                        
+                        <div class="weight-summary">
+                            <h3><i class="fas fa-weight-hanging"></i> Weight Summary</h3>
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Component</th>
+                                        <th>Weight (kg)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Frame</td>
+                                        <td>${totalProfileWeight.toFixed(2)}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Glass</td>
+                                        <td>${totalGlassWeight.toFixed(2)}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Glazing Bead</td>
+                                        <td>${totalGlazingBeadWeight.toFixed(2)}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Accessories & Hardware (est.)</td>
+                                        <td>${(0.05 * (totalProfileWeight + totalGlassWeight + totalGlazingBeadWeight)).toFixed(2)}</td>
+                                    </tr>
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td><strong>Total Weight:</strong></td>
+                                        <td><strong>${totalWeight} kg</strong></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            container.innerHTML = html;
+            
+            // Add CSS for the new layout
+            const style = document.createElement('style');
+            style.textContent = `
+                .assembly-list {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 20px;
+                }
+                
+                .window-preview-section {
+                    border: 1px solid #ddd;
+                    border-radius: 5px;
+                    padding: 15px;
+                    background-color: #f9f9f9;
+                    margin-bottom: 20px;
+                }
+                
+                .window-preview-container {
+                    display: flex;
+                    justify-content: center;
+                    margin: 15px 0;
+                }
+                
+                .preview-details {
+                    display: flex;
+                    flex-wrap: wrap;
+                    justify-content: space-around;
+                    gap: 10px;
+                }
+                
+                .preview-details p {
+                    margin: 5px 15px;
+                }
+                
+                .assembly-details-section {
+                    border: 1px solid #ddd;
+                    border-radius: 5px;
+                    padding: 15px;
+                }
+            `;
+            
+            document.head.appendChild(style);
+        }
+        
+        function exportToCSV() {
+            try {
+                showStatusMessage("Generating CSV...");
+                
+                // Get the active tab
+                const activeTab = document.querySelector('.tab-btn.active').getAttribute('data-tab');
+                const activeTabContent = document.getElementById(`${activeTab}-tab`);
+                
+                // Find tables in the active tab
+                const tables = activeTabContent.querySelectorAll('.data-table');
+                
+                // If no tables found
+                if (tables.length === 0) {
+                    showStatusMessage("No data to export to CSV.", "info");
+                    return;
+                }
+                
+                // Prepare CSV data
+                let csvContent = [];
+                
+                // Add config details header
+                const config = collectConfiguration();
+                csvContent.push(["MP70 Fixed Window Configuration"]);
+                csvContent.push(["Generated: " + new Date().toLocaleString()]);
+                csvContent.push([]);
+                csvContent.push(["Configuration Details:"]);
+                csvContent.push(["Position Code", config.positionCode]);
+                csvContent.push(["Window Type", config.windowType]);
+                csvContent.push(["Dimensions", `${config.width} × ${config.height} mm`]);
+                csvContent.push(["Quantity", config.quantity]);
+                csvContent.push(["Glass Thickness", `${config.glassThickness} mm`]);
+                csvContent.push(["Color", `${config.colorType} ${config.colorCode}`]);
+                csvContent.push(["Total Weight", `${calculateTotalWeight()} kg`]);
+                csvContent.push([]);
+                
+                // Process each table
+                tables.forEach((table, tableIndex) => {
+                    // Get the preceding h3 heading as the table title
+                    let tableTitle = "Table " + (tableIndex + 1);
+                    const prevHeading = table.previousElementSibling;
+                    if (prevHeading && prevHeading.tagName === 'H3') {
+                        tableTitle = prevHeading.textContent.trim();
+                    }
+                    
+                    // Add table title row
+                    csvContent.push([tableTitle]);
+                    csvContent.push([]);  // Empty row for spacing
+                    
+                    // Extract header row
+                    const headerRow = [];
+                    table.querySelectorAll('thead th').forEach(th => {
+                        if (!th.hasAttribute('colspan')) {
+                            headerRow.push(th.textContent.trim());
+                        }
+                    });
+                    csvContent.push(headerRow);
+                    
+                    // Extract data rows
+                    table.querySelectorAll('tbody tr').forEach(tr => {
+                        const rowData = [];
+                        tr.querySelectorAll('td').forEach(td => {
+                            rowData.push(td.textContent.trim());
+                        });
+                        csvContent.push(rowData);
+                    });
+                    
+                    // Add empty rows between tables
+                    if (tableIndex < tables.length - 1) {
+                        csvContent.push([]);
+                        csvContent.push([]);
+                    }
+                });
+                
+                // Convert to CSV string
+                const csv = Papa.unparse(csvContent);
+                
+                // Create a Blob and download link
+                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement("a");
+                link.setAttribute("href", url);
+                
+                // Generate filename
+                const filename = `MP70_Fixed_${config.windowType}_${config.width}x${config.height}_Qty${config.quantity}.csv`;
+                link.setAttribute("download", filename);
+                
+                // Trigger download
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                showStatusMessage("CSV exported successfully!", "success");
+            } catch (error) {
+                console.error('Error generating CSV:', error);
+                showStatusMessage("Error generating CSV: " + error.message, "error");
+            }
+        }
+        
+        function exportToJSON() {
+            try {
+                showStatusMessage("Generating JSON...");
+                
+                const config = collectConfiguration();
+                const configurator = new MP70FixedWindowConfigurator(config);
+                
+                // Add weight calculations to the JSON export
+                const jsonData = JSON.parse(configurator.exportToJSON());
+                jsonData.totalWeight = calculateTotalWeight();
+                
+                const jsonOutput = JSON.stringify(jsonData, null, 2);
+                
+                // Create a Blob and download link
+                const blob = new Blob([jsonOutput], { type: 'application/json;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement("a");
+                link.setAttribute("href", url);
+                
+                // Generate filename
+                const filename = `MP70_Fixed_${config.windowType}_${config.width}x${config.height}_Qty${config.quantity}.json`;
+                link.setAttribute("download", filename);
+                
+                // Trigger download
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                showStatusMessage("JSON exported successfully!", "success");
+            } catch (error) {
+                console.error('Error generating JSON:', error);
+                showStatusMessage("Error generating JSON: " + error.message, "error");
+            }
+        }
+    </script>
+</body>
+</html>
