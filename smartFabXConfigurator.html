@@ -1,0 +1,2253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartFabX - Facade Configuration System</title>
+    <link rel="stylesheet" href="assets/styles/commonNavigation.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-blue: #0ea5e9;
+            --light-bg: #f8fafc;
+            --white: #ffffff;
+            --card-bg: #ffffff;
+            --border-color: #e2e8f0;
+            --text-primary: #334155;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            --accent-blue: #06b6d4;
+            --success-green: #10b981;
+            --warning-amber: #f59e0b;
+            --danger-red: #ef4444;
+            --transition: all 0.3s ease;
+            --header-bg: #ffffff;
+            --nav-bg: #f1f5f9;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            background: var(--light-bg);
+            color: var(--text-primary);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            min-height: 100vh;
+        }
+
+        .app-wrapper {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .app-header {
+            background: var(--header-bg);
+            padding: 20px 30px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logo-section {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--accent-blue));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: white;
+            font-size: 24px;
+            box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
+        }
+
+        .header-title h1 {
+            background: linear-gradient(135deg, var(--primary-blue), var(--accent-blue));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .header-title p {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-left: auto;
+            padding: 12px 16px;
+            background: var(--light-bg);
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            transition: var(--transition);
+        }
+
+        .user-info:hover {
+            border-color: var(--primary-blue);
+            box-shadow: 0 2px 8px rgba(14, 165, 233, 0.15);
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-blue), var(--accent-blue));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: white;
+            font-size: 14px;
+        }
+
+        .user-details p {
+            font-size: 12px;
+            line-height: 1.4;
+        }
+
+        .user-details .user-name {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .user-details .user-role {
+            color: var(--text-muted);
+        }
+
+        /* Navigation Bar */
+        .top-nav {
+            background: var(--white);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 30px;
+            display: flex;
+            align-items: center;
+            height: 70px;
+            gap: 15px;
+            box-shadow: var(--shadow);
+            overflow-x: auto;
+        }
+
+        .nav-btn {
+            padding: 12px 24px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            background: white;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: var(--transition);
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-btn:hover {
+            background: rgba(14, 165, 233, 0.05);
+            border-color: var(--primary-blue);
+            color: var(--primary-blue);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(14, 165, 233, 0.15);
+        }
+
+        .nav-btn.active {
+            background: linear-gradient(135deg, var(--primary-blue), var(--accent-blue));
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
+        }
+
+        .nav-btn-load {
+            background: linear-gradient(135deg, var(--success-green), #059669);
+            color: white;
+            border: none;
+        }
+
+        .nav-btn-load:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        .nav-btn-print {
+            background: linear-gradient(135deg, var(--warning-amber), #d97706);
+            color: white;
+            border: none;
+        }
+
+        .nav-btn-print:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-header {
+            margin-bottom: 30px;
+        }
+
+        .section-header h1 {
+            font-size: 32px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-blue), var(--accent-blue));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+        }
+
+        .section-header p {
+            color: var(--text-muted);
+            font-size: 15px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+        }
+
+        .stat-card:hover {
+            border-color: var(--primary-blue);
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-2px);
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-value {
+            font-size: 36px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-blue), var(--accent-blue));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+        }
+
+        .stat-detail {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .card-header {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-header h2 {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-blue), var(--accent-blue));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(14, 165, 233, 0.3);
+        }
+
+        .btn-secondary {
+            background: rgba(14, 165, 233, 0.1);
+            color: white;
+            border: 1px solid var(--primary-blue);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(14, 165, 233, 0.2);
+        }
+
+        .systems-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+        }
+
+        .system-card {
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            background: var(--card-bg);
+            cursor: pointer;
+            transition: var(--transition);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: var(--shadow);
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .system-card:hover {
+            border-color: var(--primary-blue);
+            transform: translateY(-6px);
+            box-shadow: var(--shadow-lg), 0 0 0 3px rgba(14, 165, 233, 0.1);
+        }
+
+        .system-image {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, var(--light-bg), #e0f2fe);
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .system-image img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .system-content {
+            padding: 24px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .system-name {
+            color: var(--primary-blue);
+            margin-bottom: 12px;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .system-desc {
+            color: var(--text-secondary);
+            font-size: 14px;
+            line-height: 1.6;
+            flex: 1;
+            margin-bottom: 16px;
+        }
+
+        .system-footer {
+            padding-top: 16px;
+            border-top: 1px solid var(--border-color);
+            font-size: 13px;
+            color: var(--text-muted);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+        }
+
+        .system-arrow {
+            color: var(--primary-blue);
+            font-weight: bold;
+            font-size: 20px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            color: var(--text-muted);
+        }
+
+        .empty-state-icon {
+            font-size: 72px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            color: var(--text-secondary);
+            margin: 15px 0;
+            font-size: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .systems-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .top-nav {
+                padding: 0 15px;
+                gap: 10px;
+            }
+
+            .nav-btn {
+                padding: 10px 16px;
+                font-size: 13px;
+            }
+        }
+
+        @media print {
+            .app-header, .top-nav {
+                display: none;
+            }
+            .main-content {
+                padding: 0;
+            }
+            #bomOptimizationModal {
+                display: block !important;
+                position: relative !important;
+                background: white !important;
+                width: 100% !important;
+                max-width: none !important;
+                padding: 0 !important;
+            }
+            #bomOptimizationModal > div {
+                box-shadow: none !important;
+                max-width: none !important;
+            }
+            #bomOptimizationModal button {
+                display: none !important;
+            }
+            .project-card {
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-wrapper">
+        <!-- App Header -->
+        <header class="app-header">
+            <div class="header-left">
+                <div class="logo-section">SF</div>
+                <div class="header-title">
+                    <h1>SmartFabX</h1>
+                    <p>Facade Configuration System</p>
+                </div>
+            </div>
+            <div class="user-info">
+                <div class="user-avatar">FT</div>
+                <div class="user-details">
+                    <p class="user-name">NLG Design Department</p>
+                    <p class="user-role">Yoonas</p>
+                </div>
+            </div>
+        </header>
+
+        <!-- Top Navigation Bar -->
+        <nav class="top-nav">
+            <button class="nav-btn nav-btn-load" onclick="loadSaved()">📂 Load Saved</button>
+            <button class="nav-btn active" onclick="showSection('home', this)">🏠 Home</button>
+            <button class="nav-btn" onclick="showSection('projects', this)">📁 Projects</button>
+            <button class="nav-btn" onclick="showSection('assembly', this)">📋 Assembly List</button>
+            <button class="nav-btn nav-btn-print" onclick="printPage()">🖨 Print</button>
+        </nav>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Home Section (System Brands) -->
+            <section id="home" class="section active">
+                <div class="section-header">
+                    <h1>🏠 Aluminum Systems & Brands</h1>
+                    <p>Select a system to configure doors, windows, and facades</p>
+                </div>
+
+                <!-- System Brands Section -->
+                <div class="card">
+                    <div class="systems-grid">
+                        <a href="systems/cortizo_index.html" class="system-card">
+                            <div class="system-image">
+                                <img src="Main/Data/images/systems/cortizo/Cortizo logo.JPG" alt="Cortizo">
+                            </div>
+                            <div class="system-content">
+                                <div class="system-name">Cortizo Systems</div>
+                                <div class="system-desc">Premium aluminum and steel facade systems with innovative technology</div>
+                                <div class="system-footer">
+                                    <span>15+ Systems</span>
+                                    <span class="system-arrow">→</span>
+                                </div>
+                            </div>
+                        </a>
+
+                        <a href="systems/ultravista_index.html" class="system-card">
+                            <div class="system-image">
+                                <img src="Main/Data/images/systems/ultravista/UVGlass.jpg" alt="UltraVista">
+                            </div>
+                            <div class="system-content">
+                                <div class="system-name">UltraVista Systems</div>
+                                <div class="system-desc">Minimal frame sliding and pivot systems with maximum transparency</div>
+                                <div class="system-footer">
+                                    <span>4+ Systems</span>
+                                    <span class="system-arrow">→</span>
+                                </div>
+                            </div>
+                        </a>
+
+                        <a href="systems/equity_index.html" class="system-card">
+                            <div class="system-image">
+                                <img src="Main/Data/images/systems/equity/EQUITY.jpg" alt="Equity">
+                            </div>
+                            <div class="system-content">
+                                <div class="system-name">Equity Systems</div>
+                                <div class="system-desc">High-performance thermally broken door and window systems</div>
+                                <div class="system-footer">
+                                    <span>3+ Systems</span>
+                                    <span class="system-arrow">→</span>
+                                </div>
+                            </div>
+                        </a>
+
+                        <a href="systems/gulf_index.html" class="system-card">
+                            <div class="system-image">
+                                <img src="Main/Data/images/systems/gulf/GE-LOGO.jpeg" alt="Gulf">
+                            </div>
+                            <div class="system-content">
+                                <div class="system-name">Gulf Systems</div>
+                                <div class="system-desc">Middle East specification systems designed for extreme climates</div>
+                                <div class="system-footer">
+                                    <span>4+ Systems</span>
+                                    <span class="system-arrow">→</span>
+                                </div>
+                            </div>
+                        </a>
+
+                        <a href="systems/miscellaneous_index.html" class="system-card">
+                            <div class="system-image">
+                                <img src="Main/Data/images/systems/miscellaneous/Mesc.JPG" alt="Miscellaneous">
+                            </div>
+                            <div class="system-content">
+                                <div class="system-name">Miscellaneous Systems</div>
+                                <div class="system-desc">Standard boxes, gutters, flashings and custom fabrication solutions</div>
+                                <div class="system-footer">
+                                    <span>3+ Systems</span>
+                                    <span class="system-arrow">→</span>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Projects Section -->
+            <section id="projects" class="section">
+                <div class="section-header">
+                    <h1>📁 Project Management</h1>
+                    <p>Organize and manage your fabrication projects</p>
+                </div>
+
+                <!-- Stats Dashboard -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">Total Projects</div>
+                        <div class="stat-value" id="stat-total-projects">0</div>
+                        <div class="stat-detail">All time</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Total Assemblies</div>
+                        <div class="stat-value" id="stat-total-assemblies">0</div>
+                        <div class="stat-detail">Across all projects</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Active Projects</div>
+                        <div class="stat-value" id="stat-active-projects">0</div>
+                        <div class="stat-detail">Currently running</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Recent Activity</div>
+                        <div class="stat-value" id="stat-recent-activity">0</div>
+                        <div class="stat-detail">Last 7 days</div>
+                    </div>
+                </div>
+
+                <!-- Toolbar -->
+                <div class="card" style="margin-bottom: 20px;">
+                    <div class="card-header">
+                        <h2>Actions</h2>
+                    </div>
+                    <div style="padding: 15px; display: flex; gap: 10px; flex-wrap: wrap;">
+                        <button class="btn btn-primary" onclick="createNewProject()">+ New Project</button>
+                        <button class="btn btn-secondary" onclick="selectAllProjectsForExport()" style="background: #7f8c8d;">☑️ Select All</button>
+                        <button class="btn btn-secondary" onclick="exportAllProjects()" style="background: #5dade2;">📤 Export All</button>
+                        <button class="btn btn-primary" id="exportSelectedBtn" onclick="exportSelectedProjects()" style="background: #2ecc71; display: none;">
+                            ✅ Export Selected (<span id="selectedProjectCount">0</span>)
+                        </button>
+                        <button class="btn btn-secondary" onclick="importProjects()" style="background: #48c9b0;">📥 Import Projects</button>
+                        <button class="btn btn-warning" onclick="refreshProjectsView()">🔄 Refresh</button>
+                    </div>
+                </div>
+
+                <!-- Projects List -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2>All Projects</h2>
+                        <input type="text" id="search-projects" placeholder="🔍 Search projects..." style="padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 14px;" oninput="filterProjects(this.value)">
+                    </div>
+                    <div id="projects-container">
+                        <div class="empty-state">
+                            <div class="empty-state-icon">📁</div>
+                            <h3>No Projects Yet</h3>
+                            <p>Create your first project to get started</p>
+                            <button class="btn btn-primary" onclick="createNewProject()" style="margin-top: 15px;">+ Create Project</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Assembly List Section -->
+            <section id="assembly" class="section">
+                <div class="section-header">
+                    <h1>📋 Assembly List</h1>
+                    <p>View and manage all assemblies across projects</p>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2>All Assemblies</h2>
+                        <button class="btn btn-secondary">Filter</button>
+                    </div>
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📋</div>
+                        <h3>Assembly List View</h3>
+                        <p>Comprehensive assembly management coming soon</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // PROJECT MANAGEMENT SYSTEM - REAL DATA ONLY
+        // ============================================
+        
+        const STORAGE_KEY = 'smartfabx_projects';
+        
+        // Get all projects from localStorage
+        function getProjects() {
+            try {
+                const data = localStorage.getItem(STORAGE_KEY);
+                return data ? JSON.parse(data) : [];
+            } catch (error) {
+                console.error('Error loading projects:', error);
+                return [];
+            }
+        }
+        
+        // Save projects to localStorage
+        function saveProjects(projects) {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(projects));
+                return true;
+            } catch (error) {
+                console.error('Error saving projects:', error);
+                showNotification('Failed to save projects', 'error');
+                return false;
+            }
+        }
+        
+        // Update all statistics with REAL data
+        function updateStats() {
+            const projects = getProjects();
+            const totalProjects = projects.length;
+            
+            // Count total assemblies across all projects
+            let totalAssemblies = 0;
+            projects.forEach(project => {
+                if (project.assemblies && Array.isArray(project.assemblies)) {
+                    totalAssemblies += project.assemblies.length;
+                }
+            });
+            
+            // Count active projects (status = 'active' or 'in-progress')
+            const activeProjects = projects.filter(p => 
+                p.status === 'active' || p.status === 'in-progress'
+            ).length;
+            
+            // Count recent activity (last 7 days)
+            const sevenDaysAgo = Date.now() - (7 * 24 * 60 * 60 * 1000);
+            const recentActivity = projects.filter(p => {
+                const updatedAt = p.updatedAt || p.createdAt || 0;
+                return updatedAt > sevenDaysAgo;
+            }).length;
+            
+            // Update DOM elements
+            document.getElementById('stat-total-projects').textContent = totalProjects;
+            document.getElementById('stat-total-assemblies').textContent = totalAssemblies;
+            document.getElementById('stat-active-projects').textContent = activeProjects;
+            document.getElementById('stat-recent-activity').textContent = recentActivity;
+            
+            console.log('📊 Stats Updated:', { totalProjects, totalAssemblies, activeProjects, recentActivity });
+        }
+        
+        // Render all projects
+        function renderProjects(filteredProjects = null) {
+            const projects = filteredProjects || getProjects();
+            const container = document.getElementById('projects-container');
+            
+            if (projects.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📁</div>
+                        <h3>No Projects Yet</h3>
+                        <p>Create your first project to get started</p>
+                        <button class="btn btn-primary" onclick="createNewProject()" style="margin-top: 15px;">+ Create Project</button>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Sort by most recent first
+            projects.sort((a, b) => (b.updatedAt || b.createdAt || 0) - (a.updatedAt || a.createdAt || 0));
+            
+            container.innerHTML = projects.map(project => {
+                const assemblyCount = project.assemblies ? project.assemblies.length : 0;
+                return `
+                <div class="project-item" style="background: white; border: 2px solid var(--border-color); border-radius: 10px; padding: 0; margin-bottom: 20px; overflow: hidden;">
+                    <!-- Project Header -->
+                    <div style="background: linear-gradient(135deg, #0ea5e9, #06b6d4); padding: 15px 20px; color: white;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <input type="checkbox" class="project-select-checkbox" data-project-id="${project.id}" 
+                                       style="width: 20px; height: 20px; cursor: pointer; accent-color: white;" 
+                                       onchange="updateExportButtonState()" title="Select for export">
+                                <h3 style="margin: 0; font-size: 20px; font-weight: 700; display: flex; align-items: center; gap: 10px;">
+                                    📁 ${escapeHtml(project.projectName || 'Untitled Project')}
+                                </h3>
+                            </div>
+                            <div style="display: flex; gap: 8px;">
+                                <button onclick="editProject('${project.id}')" style="padding: 8px 16px; font-size: 13px; background: rgba(255,255,255,0.95); color: #0ea5e9; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; transition: all 0.3s; box-shadow: 0 2px 8px rgba(0,0,0,0.15);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.2)'; this.style.background='#ffffff'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(0,0,0,0.15)'; this.style.background='rgba(255,255,255,0.95)'">
+                                    ✏️ Edit
+                                </button>
+                                <button onclick="deleteProject('${project.id}')" style="padding: 8px 16px; font-size: 13px; background: rgba(239,68,68,0.9); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; transition: all 0.3s; box-shadow: 0 2px 8px rgba(0,0,0,0.15);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(239,68,68,0.4)'; this.style.background='#ef4444'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(0,0,0,0.15)'; this.style.background='rgba(239,68,68,0.9)'">
+                                    🗑️ Delete
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Project Details Table -->
+                    <div style="padding: 20px;">
+                        <table style="width: 100%; border-collapse: collapse; margin-bottom: 15px;">
+                            <tr>
+                                <td style="padding: 8px 12px; font-weight: 600; color: #64748b; width: 100px;">Job:</td>
+                                <td style="padding: 8px 12px; color: #334155;">${escapeHtml(project.jobNumber || 'N/A')}</td>
+                                <td style="padding: 8px 12px; font-weight: 600; color: #64748b; width: 100px;">Manager:</td>
+                                <td style="padding: 8px 12px; color: #334155;">${escapeHtml(project.projectManager || 'N/A')}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px 12px; font-weight: 600; color: #64748b;">Location:</td>
+                                <td style="padding: 8px 12px; color: #334155;">${escapeHtml(project.location || 'N/A')}</td>
+                                <td style="padding: 8px 12px; font-weight: 600; color: #64748b;">Assemblies:</td>
+                                <td style="padding: 8px 12px; color: #334155;">${assemblyCount}</td>
+                            </tr>
+                        </table>
+                        
+                        <!-- Assemblies Section -->
+                        <div style="border-top: 1px solid var(--border-color); padding-top: 15px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                                <strong style="color: var(--text-primary); font-size: 15px;">Assemblies (${assemblyCount}):</strong>
+                                <button onclick="toggleAssemblies('${project.id}')" style="padding: 6px 12px; font-size: 12px; background: #0ea5e9; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600;">
+                                    <span id="toggle-icon-${project.id}">▼</span> Collapse
+                                </button>
+                            </div>
+                            <div id="assemblies-${project.id}" style="display: block; margin-top: 10px;">
+                                ${renderAssemblies(project.assemblies || [], project.id)}
+                            </div>
+                        </div>
+                        
+                        ${project.notes ? `<div style="margin-top: 15px; padding: 12px; background: #fff9e6; border-left: 4px solid #f39c12; border-radius: 4px; font-size: 13px;">
+                            <strong>📝 Notes:</strong> ${escapeHtml(project.notes)}
+                        </div>` : ''}
+                    </div>
+                </div>
+            `;
+            }).join('');
+        }
+        
+        // Render assemblies for a project
+        function renderAssemblies(assemblies, projectId) {
+            if (!assemblies || assemblies.length === 0) {
+                return '<p style="color: var(--text-muted); font-size: 13px; margin: 0;">No assemblies added yet</p>';
+            }
+            
+            return assemblies.map((assembly, index) => {
+                const width = assembly.width || 0;
+                const height = assembly.height || 0;
+                const trackType = assembly.trackType || assembly.systemType || 'N/A';
+                const panels = assembly.panels ? assembly.panels.length : 0;
+                const qty = assembly.assemblyQty || 1;
+                
+                return `
+                    <div style="background: white; border: 1px solid var(--border-color); padding: 12px; border-radius: 6px; margin-bottom: 10px;">
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
+                            <div style="flex: 1;">
+                                <strong style="color: #0ea5e9; font-size: 15px; display: block; margin-bottom: 6px;">
+                                    ${escapeHtml(assembly.positionCode || `Assembly #${index + 1}`)}
+                                </strong>
+                                <div style="font-size: 13px; color: var(--text-secondary);">
+                                    ${width}×${height}mm | ${escapeHtml(trackType)} | ${panels} Panels
+                                    <span style="background: #e74c3c; color: white; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; margin-left: 8px;">
+                                        QTY: ${qty}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 8px; margin-top: 10px;">
+                            <button onclick="viewAssemblyDetails('${projectId}', ${index})" style="padding: 6px 12px; font-size: 12px; background: #9b59b6; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600;">
+                                📊 View BOM & Optimization
+                            </button>
+                            <button onclick="loadAssembly('${projectId}', ${index})" style="padding: 6px 12px; font-size: 12px; background: #27ae60; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600;">
+                                📂 Load
+                            </button>
+                            <button onclick="copyAssembly('${projectId}', ${index})" style="padding: 6px 12px; font-size: 12px; background: #3498db; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600;">
+                                📋 Copy
+                            </button>
+                            <button onclick="deleteAssembly('${projectId}', ${index})" style="padding: 6px 12px; font-size: 12px; background: #e74c3c; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600;">
+                                🗑️
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // Toggle assemblies visibility
+        function toggleAssemblies(projectId) {
+            const container = document.getElementById(`assemblies-${projectId}`);
+            const button = container.previousElementSibling.querySelector('button');
+            const icon = document.getElementById(`toggle-icon-${projectId}`);
+            
+            if (container.style.display === 'none' || container.style.display === '') {
+                container.style.display = 'block';
+                icon.textContent = '▲';
+                button.innerHTML = '<span id="toggle-icon-' + projectId + '">▲</span> Collapse';
+            } else {
+                container.style.display = 'none';
+                icon.textContent = '▼';
+                button.innerHTML = '<span id="toggle-icon-' + projectId + '">▼</span> Expand';
+            }
+        }
+        
+        // Get status badge color
+        function getStatusColor(status) {
+            const colors = {
+                'planning': '#95a5a6',
+                'in-progress': '#3498db',
+                'active': '#27ae60',
+                'on-hold': '#f39c12',
+                'completed': '#2ecc71',
+                'cancelled': '#e74c3c'
+            };
+            return colors[status] || '#95a5a6';
+        }
+        
+        // Create new project
+        function createNewProject() {
+            showProjectModal();
+        }
+        
+        // Show project modal
+        function showProjectModal(projectId = null) {
+            const modal = document.getElementById('projectModal');
+            const title = document.getElementById('projectModalTitle');
+            const btnText = document.getElementById('saveProjectBtnText');
+            
+            if (projectId) {
+                // Edit mode
+                const projects = getProjects();
+                const project = projects.find(p => p.id === projectId);
+                if (!project) return;
+                
+                title.textContent = 'Edit Project';
+                btnText.textContent = 'Save Changes';
+                document.getElementById('modalProjectName').value = project.projectName || '';
+                document.getElementById('modalJobNumber').value = project.jobNumber || '';
+                document.getElementById('modalProjectManager').value = project.projectManager || '';
+                document.getElementById('modalLocation').value = project.location || '';
+                document.getElementById('modalGlass').value = project.approvedGlass || '';
+                document.getElementById('modalFinish').value = project.approvedFinish || '';
+                document.getElementById('modalStatus').value = project.status || 'planning';
+                document.getElementById('modalNotes').value = project.notes || '';
+                modal.dataset.editId = projectId;
+            } else {
+                // Create mode
+                title.textContent = 'Create New Project';
+                btnText.textContent = 'Create Project';
+                document.getElementById('modalProjectName').value = '';
+                document.getElementById('modalJobNumber').value = '';
+                document.getElementById('modalProjectManager').value = '';
+                document.getElementById('modalLocation').value = '';
+                document.getElementById('modalGlass').value = '';
+                document.getElementById('modalFinish').value = '';
+                document.getElementById('modalStatus').value = 'planning';
+                document.getElementById('modalNotes').value = '';
+                delete modal.dataset.editId;
+            }
+            
+            modal.style.display = 'flex';
+        }
+        
+        // Close project modal
+        function closeProjectModal() {
+            document.getElementById('projectModal').style.display = 'none';
+        }
+        
+        // Save project from modal
+        function saveProjectFromModal() {
+            const projectName = document.getElementById('modalProjectName').value.trim();
+            const jobNumber = document.getElementById('modalJobNumber').value.trim();
+            const projectManager = document.getElementById('modalProjectManager').value.trim();
+            const location = document.getElementById('modalLocation').value.trim();
+            
+            // Validation
+            if (!projectName) {
+                showNotification('❌ Project Name is required', 'error');
+                document.getElementById('modalProjectName').focus();
+                return;
+            }
+            if (!jobNumber) {
+                showNotification('❌ Job Number is required', 'error');
+                document.getElementById('modalJobNumber').focus();
+                return;
+            }
+            if (!projectManager) {
+                showNotification('❌ Project Manager is required', 'error');
+                document.getElementById('modalProjectManager').focus();
+                return;
+            }
+            if (!location) {
+                showNotification('❌ Location is required', 'error');
+                document.getElementById('modalLocation').focus();
+                return;
+            }
+            
+            const modal = document.getElementById('projectModal');
+            const editId = modal.dataset.editId;
+            const projects = getProjects();
+            
+            if (editId) {
+                // Update existing project
+                const project = projects.find(p => p.id === editId);
+                if (project) {
+                    project.projectName = projectName;
+                    project.jobNumber = jobNumber;
+                    project.projectManager = projectManager;
+                    project.location = location;
+                    project.approvedGlass = document.getElementById('modalGlass').value.trim();
+                    project.approvedFinish = document.getElementById('modalFinish').value.trim();
+                    project.status = document.getElementById('modalStatus').value;
+                    project.notes = document.getElementById('modalNotes').value.trim();
+                    project.updatedAt = Date.now();
+                    
+                    if (saveProjects(projects)) {
+                        showNotification('✅ Project updated successfully!', 'success');
+                        refreshProjectsView();
+                        closeProjectModal();
+                    }
+                }
+            } else {
+                // Create new project
+                const newProject = {
+                    id: 'PRJ-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9),
+                    projectName,
+                    jobNumber,
+                    projectManager,
+                    location,
+                    approvedGlass: document.getElementById('modalGlass').value.trim(),
+                    approvedFinish: document.getElementById('modalFinish').value.trim(),
+                    status: document.getElementById('modalStatus').value,
+                    assemblies: [],
+                    notes: document.getElementById('modalNotes').value.trim(),
+                    createdAt: Date.now(),
+                    updatedAt: Date.now()
+                };
+                
+                projects.push(newProject);
+                
+                if (saveProjects(projects)) {
+                    showNotification('✅ Project created successfully!', 'success');
+                    refreshProjectsView();
+                    closeProjectModal();
+                }
+            }
+        }
+        
+        // Edit project
+        // Edit project
+        function editProject(projectId) {
+            showProjectModal(projectId);
+        }
+        
+        // Delete project
+        function deleteProject(projectId) {
+            const projects = getProjects();
+            const project = projects.find(p => p.id === projectId);
+            if (!project) return;
+            
+            const assemblyCount = project.assemblies ? project.assemblies.length : 0;
+            showDeleteConfirmModal(
+                'Delete Project',
+                `You are about to delete project <strong>"${project.projectName}"</strong>.<br><br>` +
+                `This will permanently remove:<br>` +
+                `• The project and all its data<br>` +
+                `• ${assemblyCount} assembly/assemblies<br><br>` +
+                `This action cannot be undone.`,
+                () => {
+                    const filtered = projects.filter(p => p.id !== projectId);
+                    if (saveProjects(filtered)) {
+                        showNotification('✅ Project deleted successfully!', 'success');
+                        refreshProjectsView();
+                    }
+                }
+            );
+        }
+        
+        // Delete assembly
+        function deleteAssembly(projectId, assemblyIndex) {
+            const projects = getProjects();
+            const project = projects.find(p => p.id === projectId);
+            if (!project || !project.assemblies) return;
+            
+            const assembly = project.assemblies[assemblyIndex];
+            if (!assembly) return;
+            
+            showDeleteConfirmModal(
+                'Delete Assembly',
+                `You are about to delete assembly <strong>"${assembly.positionCode || 'Unnamed'}"</strong> ` +
+                `from project "${project.projectName}".<br><br>` +
+                `Assembly details:<br>` +
+                `• Size: ${assembly.width || 0}mm × ${assembly.height || 0}mm<br>` +
+                `• System: ${assembly.systemType || 'N/A'}<br>` +
+                `• Quantity: ${assembly.assemblyQty || 1} unit(s)<br><br>` +
+                `This action cannot be undone.`,
+                () => {
+                    project.assemblies.splice(assemblyIndex, 1);
+                    project.updatedAt = Date.now();
+                    
+                    if (saveProjects(projects)) {
+                        showNotification('✅ Assembly deleted!', 'success');
+                        refreshProjectsView();
+                    }
+                }
+            );
+        }
+        
+        // Show delete confirmation modal
+        let deleteCallback = null;
+        function showDeleteConfirmModal(title, message, onConfirm) {
+            deleteCallback = onConfirm;
+            document.getElementById('deleteModalTitle').textContent = title;
+            document.getElementById('deleteModalMessage').innerHTML = message;
+            document.getElementById('deleteConfirmModal').style.display = 'flex';
+        }
+        
+        // Close delete confirmation modal
+        function closeDeleteConfirmModal() {
+            document.getElementById('deleteConfirmModal').style.display = 'none';
+            deleteCallback = null;
+        }
+        
+        // Confirm delete action
+        function confirmDelete() {
+            if (deleteCallback) {
+                deleteCallback();
+                closeDeleteConfirmModal();
+            }
+        }
+        
+        // Load assembly into configurator
+        function loadAssembly(projectId, assemblyIndex) {
+            const projects = getProjects();
+            const project = projects.find(p => p.id === projectId);
+            if (!project || !project.assemblies) return;
+            
+            const assembly = project.assemblies[assemblyIndex];
+            if (!assembly) return;
+            
+            // Determine which configurator to open based on system type
+            let configuratorPath = '';
+            let fallbackPath = '';
+            const systemType = (assembly.systemType || assembly.system || '').toLowerCase();
+            
+            if (systemType.includes('opv30')) {
+                configuratorPath = '/Main/cortizo/opv30/opv30_sliding_door.html';
+                fallbackPath = 'file:///C:/SmartFabX/Main/cortizo/opv30/opv30_sliding_door.html';
+            } else if (systemType.includes('mp80') && systemType.includes('pivot')) {
+                configuratorPath = '/Main/cortizo/mp80_pivot/mp80_pivot_panel.html';
+                fallbackPath = 'file:///C:/SmartFabX/Main/cortizo/mp80_pivot/mp80_pivot_panel.html';
+            } else if (systemType.includes('uv38') && systemType.includes('sliding')) {
+                configuratorPath = '/Main/ultravista/uv38_sliding/uv38_sliding_index.html';
+                fallbackPath = 'file:///C:/SmartFabX/Main/ultravista/uv38_sliding/uv38_sliding_index.html';
+            } else if (systemType.includes('uv38') && systemType.includes('pivot')) {
+                configuratorPath = '/Main/ultravista/uv38_pivot/uv38_pivot_index.html';
+                fallbackPath = 'file:///C:/SmartFabX/Main/ultravista/uv38_pivot/uv38_pivot_index.html';
+            } else if (systemType.includes('cor70')) {
+                configuratorPath = '/Main/cortizo/cor70/cor70_fixed_window.html';
+                fallbackPath = 'file:///C:/SmartFabX/Main/cortizo/cor70/cor70_fixed_window.html';
+            } else if (systemType.includes('cor80')) {
+                configuratorPath = '/Main/cortizo/cor80/cor80_ho.html';
+                fallbackPath = 'file:///C:/SmartFabX/Main/cortizo/cor80/cor80_ho.html';
+            } else if (systemType.includes('cvp38')) {
+                configuratorPath = '/Main/cortizo/CVP/cvp38_sliding_door.html';
+                fallbackPath = 'file:///C:/SmartFabX/Main/cortizo/CVP/cvp38_sliding_door.html';
+            } else if (systemType.includes('cvp54')) {
+                configuratorPath = '/Main/cortizo/CVP/cvp54_sliding_door.html';
+                fallbackPath = 'file:///C:/SmartFabX/Main/cortizo/CVP/cvp54_sliding_door.html';
+            } else if (systemType.includes('mp70')) {
+                configuratorPath = '/Main/cortizo/mp70_fix/mp70_fixed_window.html';
+                fallbackPath = 'file:///C:/SmartFabX/Main/cortizo/mp70_fix/mp70_fixed_window.html';
+            } else {
+                // Default to OPV30 if system type not recognized
+                configuratorPath = '/Main/cortizo/opv30/opv30_sliding_door.html';
+                fallbackPath = 'file:///C:/SmartFabX/Main/cortizo/opv30/opv30_sliding_door.html';
+            }
+            
+            // Store assembly data in sessionStorage for the configurator to load
+            sessionStorage.setItem('loadAssemblyData', JSON.stringify({
+                projectId: projectId,
+                projectName: project.projectName,
+                assembly: assembly
+            }));
+            
+            // Use absolute path directly to ensure correct navigation
+            window.location.href = fallbackPath;
+        }
+        
+        // Copy assembly
+        function copyAssembly(projectId, assemblyIndex) {
+            showCopyAssemblyModal(projectId, assemblyIndex);
+        }
+        
+        // Show copy assembly modal
+        let copyAssemblyData = null;
+        function showCopyAssemblyModal(projectId, assemblyIndex) {
+            const projects = getProjects();
+            const project = projects.find(p => p.id === projectId);
+            if (!project || !project.assemblies) return;
+            
+            const assembly = project.assemblies[assemblyIndex];
+            if (!assembly) return;
+            
+            // Store data for later use
+            copyAssemblyData = { projectId, assemblyIndex };
+            
+            // Show original assembly info
+            const infoDiv = document.getElementById('copyOriginalInfo');
+            infoDiv.innerHTML = `
+                <strong>Position:</strong> ${assembly.positionCode || 'N/A'}<br>
+                <strong>Size:</strong> ${assembly.width || '0'}mm × ${assembly.height || '0'}mm<br>
+                <strong>System:</strong> ${assembly.systemType || 'N/A'}<br>
+                <strong>Quantity:</strong> ${assembly.assemblyQty || 1} unit(s)
+            `;
+            
+            // Set default new position code
+            document.getElementById('copyPositionCode').value = (assembly.positionCode || 'ASSEMBLY') + '-COPY';
+            
+            document.getElementById('copyAssemblyModal').style.display = 'flex';
+        }
+        
+        // Close copy assembly modal
+        function closeCopyAssemblyModal() {
+            document.getElementById('copyAssemblyModal').style.display = 'none';
+            copyAssemblyData = null;
+        }
+        
+        // Confirm copy assembly
+        function confirmCopyAssembly() {
+            if (!copyAssemblyData) return;
+            
+            const newPositionCode = document.getElementById('copyPositionCode').value.trim();
+            
+            if (!newPositionCode) {
+                showNotification('❌ Position Code is required', 'error');
+                document.getElementById('copyPositionCode').focus();
+                return;
+            }
+            
+            const { projectId, assemblyIndex } = copyAssemblyData;
+            const projects = getProjects();
+            const project = projects.find(p => p.id === projectId);
+            
+            if (!project || !project.assemblies) {
+                closeCopyAssemblyModal();
+                return;
+            }
+            
+            const assembly = project.assemblies[assemblyIndex];
+            if (!assembly) {
+                closeCopyAssemblyModal();
+                return;
+            }
+            
+            // Create a deep copy
+            const assemblyCopy = JSON.parse(JSON.stringify(assembly));
+            assemblyCopy.positionCode = newPositionCode;
+            assemblyCopy.id = Date.now();
+            assemblyCopy.timestamp = Date.now();
+            
+            // Add to same project
+            project.assemblies.push(assemblyCopy);
+            project.updatedAt = Date.now();
+            
+            if (saveProjects(projects)) {
+                showNotification('✅ Assembly copied successfully!', 'success');
+                refreshProjectsView();
+                closeCopyAssemblyModal();
+            }
+        }
+        
+        // View Assembly Details with BOM and Optimization
+        function viewAssemblyDetails(projectId, assemblyIndex) {
+            const projects = getProjects();
+            const project = projects.find(p => p.id === projectId);
+            if (!project || !project.assemblies) return;
+            
+            const assembly = project.assemblies[assemblyIndex];
+            if (!assembly) return;
+            
+            // Update modal subtitle
+            document.getElementById('bomModalSubtitle').textContent = 
+                `${assembly.positionCode || 'Assembly #' + (assemblyIndex + 1)} - ${project.projectName}`;
+            
+            // Render assembly info
+            renderAssemblyInfo(assembly, project);
+            
+            // Render stock list
+            renderStockList(assembly);
+            
+            // Render optimization
+            renderOptimization(assembly);
+            
+            // Show modal
+            document.getElementById('bomOptimizationModal').style.display = 'block';
+        }
+        
+        // Close BOM Modal
+        function closeBOMModal() {
+            document.getElementById('bomOptimizationModal').style.display = 'none';
+        }
+        
+        // Render assembly information
+        function renderAssemblyInfo(assembly, project) {
+            const width = assembly.width || 0;
+            const height = assembly.height || 0;
+            const qty = assembly.assemblyQty || 1;
+            const systemType = assembly.systemType || assembly.system || 'N/A';
+            
+            document.getElementById('bomAssemblyInfo').innerHTML = `
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                    <div>
+                        <div style="font-size: 12px; color: #64748b; font-weight: 600;">POSITION CODE</div>
+                        <div style="font-size: 16px; color: #0ea5e9; font-weight: 700;">${assembly.positionCode || 'N/A'}</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 12px; color: #64748b; font-weight: 600;">DIMENSIONS</div>
+                        <div style="font-size: 16px; color: #334155; font-weight: 600;">${width} × ${height} mm</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 12px; color: #64748b; font-weight: 600;">QUANTITY</div>
+                        <div style="font-size: 16px; color: #e74c3c; font-weight: 700;">${qty} pcs</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 12px; color: #64748b; font-weight: 600;">SYSTEM TYPE</div>
+                        <div style="font-size: 16px; color: #334155; font-weight: 600;">${systemType}</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 12px; color: #64748b; font-weight: 600;">PROJECT</div>
+                        <div style="font-size: 16px; color: #334155; font-weight: 600;">${project.projectName}</div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Render stock list (BOM)
+        function renderStockList(assembly) {
+            const container = document.getElementById('bomStockListContent');
+            
+            // Check if stockList exists
+            if (!assembly.stockList || assembly.stockList.length === 0) {
+                container.innerHTML = `
+                    <div style="padding: 30px; text-align: center; background: #f8fafc; border-radius: 8px; border: 2px dashed #cbd5e1;">
+                        <div style="font-size: 48px; margin-bottom: 10px;">📦</div>
+                        <div style="color: #64748b; font-size: 16px;">No stock list data available for this assembly</div>
+                        <div style="color: #94a3b8; font-size: 13px; margin-top: 5px;">Load this assembly in the configurator to generate a bill of materials</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Group items by category
+            const grouped = {};
+            assembly.stockList.forEach(item => {
+                const category = item.category || item.component || 'Other';
+                if (!grouped[category]) grouped[category] = [];
+                grouped[category].push(item);
+            });
+            
+            let html = '';
+            for (const [category, items] of Object.entries(grouped)) {
+                html += `
+                    <div style="margin-bottom: 25px;">
+                        <h4 style="background: linear-gradient(135deg, #8e44ad, #9b59b6); color: white; padding: 10px 15px; border-radius: 6px; margin-bottom: 10px; font-size: 15px;">
+                            ${category}
+                        </h4>
+                        <table style="width: 100%; border-collapse: collapse; background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                            <thead>
+                                <tr style="background: #f8fafc;">
+                                    <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e2e8f0; font-size: 13px; color: #64748b;">ITEM CODE</th>
+                                    <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e2e8f0; font-size: 13px; color: #64748b;">DESCRIPTION</th>
+                                    <th style="padding: 12px; text-align: center; border-bottom: 2px solid #e2e8f0; font-size: 13px; color: #64748b;">LENGTH (mm)</th>
+                                    <th style="padding: 12px; text-align: center; border-bottom: 2px solid #e2e8f0; font-size: 13px; color: #64748b;">QTY</th>
+                                    <th style="padding: 12px; text-align: center; border-bottom: 2px solid #e2e8f0; font-size: 13px; color: #64748b;">TOTAL (mm)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${items.map((item, idx) => `
+                                    <tr style="border-bottom: 1px solid #f1f5f9; ${idx % 2 === 0 ? 'background: #fafbfc;' : ''}">
+                                        <td style="padding: 10px; font-size: 13px; color: #334155; font-weight: 600;">${item.itemCode || 'N/A'}</td>
+                                        <td style="padding: 10px; font-size: 13px; color: #334155;">${item.description || item.name || 'N/A'}</td>
+                                        <td style="padding: 10px; text-align: center; font-size: 13px; color: #334155;">${item.length || item.size || '-'}</td>
+                                        <td style="padding: 10px; text-align: center; font-size: 13px; color: #334155; font-weight: 600;">${item.quantity || item.qty || 1}</td>
+                                        <td style="padding: 10px; text-align: center; font-size: 13px; color: #0ea5e9; font-weight: 700;">${(item.length || 0) * (item.quantity || 1)}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            }
+            
+            container.innerHTML = html;
+        }
+        
+        // Render optimization results
+        function renderOptimization(assembly) {
+            const container = document.getElementById('bomOptimizationContent');
+            
+            // Check if optimization data exists
+            if (!assembly.optimization || !assembly.optimization.bars || assembly.optimization.bars.length === 0) {
+                container.innerHTML = `
+                    <div style="padding: 30px; text-align: center; background: #f8fafc; border-radius: 8px; border: 2px dashed #cbd5e1;">
+                        <div style="font-size: 48px; margin-bottom: 10px;">📐</div>
+                        <div style="color: #64748b; font-size: 16px;">No optimization data available for this assembly</div>
+                        <div style="color: #94a3b8; font-size: 13px; margin-top: 5px;">Run cut optimization in the configurator to see results here</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            const opt = assembly.optimization;
+            const totalBars = opt.bars.length;
+            const totalWaste = opt.totalWaste || 0;
+            const totalLength = opt.totalLength || 0;
+            const efficiency = totalLength > 0 ? ((totalLength - totalWaste) / totalLength * 100).toFixed(2) : 0;
+            
+            let html = `
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 20px;">
+                    <div style="background: linear-gradient(135deg, #3498db, #2980b9); padding: 15px; border-radius: 8px; color: white; text-align: center;">
+                        <div style="font-size: 24px; font-weight: 700;">${totalBars}</div>
+                        <div style="font-size: 12px; opacity: 0.9;">Total Bars Used</div>
+                    </div>
+                    <div style="background: linear-gradient(135deg, #e74c3c, #c0392b); padding: 15px; border-radius: 8px; color: white; text-align: center;">
+                        <div style="font-size: 24px; font-weight: 700;">${totalWaste}mm</div>
+                        <div style="font-size: 12px; opacity: 0.9;">Total Waste</div>
+                    </div>
+                    <div style="background: linear-gradient(135deg, #2ecc71, #27ae60); padding: 15px; border-radius: 8px; color: white; text-align: center;">
+                        <div style="font-size: 24px; font-weight: 700;">${efficiency}%</div>
+                        <div style="font-size: 12px; opacity: 0.9;">Efficiency</div>
+                    </div>
+                    <div style="background: linear-gradient(135deg, #f39c12, #e67e22); padding: 15px; border-radius: 8px; color: white; text-align: center;">
+                        <div style="font-size: 24px; font-weight: 700;">${totalLength}mm</div>
+                        <div style="font-size: 12px; opacity: 0.9;">Total Length</div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 20px;">
+                    <h4 style="color: #8e44ad; margin-bottom: 15px; font-size: 16px;">Bar Layout Visualization</h4>
+            `;
+            
+            opt.bars.forEach((bar, idx) => {
+                const barLength = bar.length || 6000;
+                const cuts = bar.cuts || [];
+                const waste = bar.waste || 0;
+                
+                html += `
+                    <div style="margin-bottom: 20px; background: white; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <strong style="color: #334155; font-size: 14px;">Bar #${idx + 1} - ${bar.itemCode || 'Profile'}</strong>
+                            <span style="font-size: 13px; color: #64748b;">
+                                ${cuts.length} cuts | Waste: <span style="color: #999999; font-weight: 600;">${waste}mm</span>
+                            </span>
+                        </div>
+                        <div style="position: relative; height: 40px; background: linear-gradient(to right, #888888, #999999); border-radius: 4px; overflow: hidden;">
+                            ${cuts.map((cut, cutIdx) => {
+                                const widthPercent = (cut / barLength) * 100;
+                                return `<div style="position: absolute; left: ${(cuts.slice(0, cutIdx).reduce((a, b) => a + b, 0) / barLength) * 100}%; width: ${widthPercent}%; height: 100%; background: linear-gradient(135deg, #3498db, #2980b9); border-right: 2px solid white; display: flex; align-items: center; justify-content: center; color: white; font-size: 11px; font-weight: 600;">${cut}mm</div>`;
+                            }).join('')}
+                            ${waste > 0 ? `<div style="position: absolute; right: 0; width: ${(waste / barLength) * 100}%; height: 100%; background: repeating-linear-gradient(45deg, #999999, #999999 10px, #888888 10px, #888888 20px); display: flex; align-items: center; justify-content: center; color: white; font-size: 10px; font-weight: 600;">${waste}mm</div>` : ''}
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-top: 5px; font-size: 11px; color: #94a3b8;">
+                            <span>0mm</span>
+                            <span>${barLength}mm</span>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+            container.innerHTML = html;
+        }
+        
+        // Print BOM Report
+        function printBOMReport() {
+            window.print();
+        }
+
+        // View project details
+        function viewProjectDetails(projectId) {
+            const projects = getProjects();
+            const project = projects.find(p => p.id === projectId);
+            if (!project) return;
+            
+            const details = `
+PROJECT DETAILS
+================
+Project Name: ${project.projectName}
+Job Number: ${project.jobNumber}
+Project Manager: ${project.projectManager}
+Location: ${project.location}
+Status: ${project.status}
+Assemblies: ${project.assemblies ? project.assemblies.length : 0}
+Notes: ${project.notes || 'None'}
+Created: ${new Date(project.createdAt).toLocaleString()}
+Updated: ${new Date(project.updatedAt).toLocaleString()}
+            `;
+            
+            alert(details);
+        }
+        
+        // Filter projects
+        function filterProjects(searchTerm) {
+            const projects = getProjects();
+            if (!searchTerm.trim()) {
+                renderProjects(projects);
+                return;
+            }
+            
+            const filtered = projects.filter(p => 
+                (p.projectName && p.projectName.toLowerCase().includes(searchTerm.toLowerCase())) ||
+                (p.jobNumber && p.jobNumber.toLowerCase().includes(searchTerm.toLowerCase())) ||
+                (p.projectManager && p.projectManager.toLowerCase().includes(searchTerm.toLowerCase())) ||
+                (p.location && p.location.toLowerCase().includes(searchTerm.toLowerCase()))
+            );
+            
+            renderProjects(filtered);
+        }
+        
+        // Export all projects to JSON file with location picker
+        async function exportAllProjects() {
+            const projects = getProjects();
+            
+            if (projects.length === 0) {
+                alert('⚠️ No projects to export.');
+                return;
+            }
+            
+            try {
+                const defaultFilename = `SmartFabX_All_Projects_${new Date().toISOString().split('T')[0]}.json`;
+                const jsonData = JSON.stringify(projects, null, 2);
+                
+                // Try to use File System Access API (modern browsers)
+                if ('showSaveFilePicker' in window) {
+                    try {
+                        const fileHandle = await window.showSaveFilePicker({
+                            suggestedName: defaultFilename,
+                            types: [{
+                                description: 'JSON Files',
+                                accept: { 'application/json': ['.json'] }
+                            }]
+                        });
+                        
+                        const writable = await fileHandle.createWritable();
+                        await writable.write(jsonData);
+                        await writable.close();
+                        
+                        showNotification(`✅ Exported ${projects.length} projects successfully to ${fileHandle.name}!`, 'success');
+                        return;
+                    } catch (err) {
+                        if (err.name === 'AbortError') {
+                            console.log('User cancelled file save');
+                            return;
+                        }
+                        console.warn('File System Access API failed, falling back to download:', err);
+                    }
+                }
+                
+                // Fallback: Traditional download with user prompt
+                const userFilename = prompt(
+                    `📁 Save location: Browser's default download folder\n\n` +
+                    `Enter filename (or click OK to use default):`,
+                    defaultFilename
+                );
+                
+                if (!userFilename) {
+                    console.log('User cancelled export');
+                    return;
+                }
+                
+                // Ensure .json extension
+                const finalFilename = userFilename.endsWith('.json') ? userFilename : userFilename + '.json';
+                
+                const blob = new Blob([jsonData], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = finalFilename;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+                
+                showNotification(`✅ Exported ${projects.length} projects to Downloads folder as "${finalFilename}"!`, 'success');
+                
+            } catch (error) {
+                console.error('Export error:', error);
+                alert('❌ Error exporting projects: ' + error.message);
+            }
+        }
+        
+        // Export selected projects to JSON file with location picker
+        async function exportSelectedProjects() {
+            const selectedCheckboxes = document.querySelectorAll('.project-select-checkbox:checked');
+            
+            if (selectedCheckboxes.length === 0) {
+                alert('⚠️ No projects selected for export.');
+                return;
+            }
+            
+            const projects = getProjects();
+            const selectedProjectIds = Array.from(selectedCheckboxes).map(cb => cb.getAttribute('data-project-id'));
+            
+            // Filter only selected projects
+            const selectedProjects = projects.filter(p => selectedProjectIds.includes(p.id));
+            
+            if (selectedProjects.length === 0) {
+                alert('⚠️ No valid projects found for export.');
+                return;
+            }
+            
+            try {
+                // Create smart filename based on selection
+                let filenamePart;
+                if (selectedProjects.length === 1) {
+                    // Single project: use project name
+                    filenamePart = selectedProjects[0].projectName.replace(/[^a-zA-Z0-9]/g, '_');
+                } else if (selectedProjects.length <= 3) {
+                    // 2-3 projects: use all names
+                    filenamePart = selectedProjects.map(p => 
+                        p.projectName.replace(/[^a-zA-Z0-9]/g, '_')
+                    ).join('_');
+                } else {
+                    // Many projects: use count
+                    filenamePart = `${selectedProjects.length}_Projects`;
+                }
+                
+                // Truncate if too long
+                if (filenamePart.length > 50) {
+                    filenamePart = filenamePart.substring(0, 50);
+                }
+                
+                const defaultFilename = `SmartFabX_${filenamePart}_${new Date().toISOString().split('T')[0]}.json`;
+                const jsonData = JSON.stringify(selectedProjects, null, 2);
+                
+                // Try to use File System Access API (modern browsers)
+                if ('showSaveFilePicker' in window) {
+                    try {
+                        const fileHandle = await window.showSaveFilePicker({
+                            suggestedName: defaultFilename,
+                            types: [{
+                                description: 'JSON Files',
+                                accept: { 'application/json': ['.json'] }
+                            }]
+                        });
+                        
+                        const writable = await fileHandle.createWritable();
+                        await writable.write(jsonData);
+                        await writable.close();
+                        
+                        showNotification(`✅ Exported ${selectedProjects.length} selected projects to ${fileHandle.name}!`, 'success');
+                        
+                        // Clear selection after export
+                        selectedCheckboxes.forEach(cb => cb.checked = false);
+                        updateExportButtonState();
+                        return;
+                        
+                    } catch (err) {
+                        if (err.name === 'AbortError') {
+                            console.log('User cancelled file save');
+                            return;
+                        }
+                        console.warn('File System Access API failed, falling back to download:', err);
+                    }
+                }
+                
+                // Fallback: Traditional download with user prompt
+                const userFilename = prompt(
+                    `📁 Exporting ${selectedProjects.length} selected project(s)\n` +
+                    `Save location: Browser's default download folder\n\n` +
+                    `Project(s): ${selectedProjects.map(p => p.projectName).join(', ')}\n\n` +
+                    `Enter filename (or click OK to use default):`,
+                    defaultFilename
+                );
+                
+                if (!userFilename) {
+                    console.log('User cancelled export');
+                    return;
+                }
+                
+                // Ensure .json extension
+                const finalFilename = userFilename.endsWith('.json') ? userFilename : userFilename + '.json';
+                
+                const blob = new Blob([jsonData], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = finalFilename;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+                
+                showNotification(`✅ Exported ${selectedProjects.length} projects to Downloads as "${finalFilename}"!`, 'success');
+                
+                // Clear selection after export
+                selectedCheckboxes.forEach(cb => cb.checked = false);
+                updateExportButtonState();
+                
+            } catch (error) {
+                console.error('Export error:', error);
+                alert('❌ Error exporting projects: ' + error.message);
+            }
+        }
+        
+        // Update export button state based on selection
+        function updateExportButtonState() {
+            const selectedCheckboxes = document.querySelectorAll('.project-select-checkbox:checked');
+            const exportBtn = document.getElementById('exportSelectedBtn');
+            const countSpan = document.getElementById('selectedProjectCount');
+            
+            if (exportBtn && countSpan) {
+                if (selectedCheckboxes.length > 0) {
+                    exportBtn.style.display = 'inline-block';
+                    countSpan.textContent = selectedCheckboxes.length;
+                } else {
+                    exportBtn.style.display = 'none';
+                }
+            }
+        }
+        
+        // Select all projects for export
+        function selectAllProjectsForExport() {
+            const checkboxes = document.querySelectorAll('.project-select-checkbox');
+            const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+            
+            checkboxes.forEach(cb => {
+                cb.checked = !allChecked;
+            });
+            
+            updateExportButtonState();
+        }
+        
+        // Clear all project selections
+        function clearProjectSelections() {
+            const checkboxes = document.querySelectorAll('.project-select-checkbox');
+            checkboxes.forEach(cb => {
+                cb.checked = false;
+            });
+            updateExportButtonState();
+        }
+        
+        // Import projects from JSON file with file picker
+        async function importProjects() {
+            try {
+                // Try to use File System Access API (modern browsers)
+                if ('showOpenFilePicker' in window) {
+                    try {
+                        const [fileHandle] = await window.showOpenFilePicker({
+                            types: [{
+                                description: 'JSON Files',
+                                accept: { 'application/json': ['.json'] }
+                            }],
+                            multiple: false
+                        });
+                        
+                        const file = await fileHandle.getFile();
+                        const contents = await file.text();
+                        const importedProjects = JSON.parse(contents);
+                        
+                        if (!Array.isArray(importedProjects)) {
+                            alert('❌ Invalid file format. Expected an array of projects.');
+                            return;
+                        }
+                        
+                        processImportedProjects(importedProjects, file.name);
+                        return;
+                        
+                    } catch (err) {
+                        if (err.name === 'AbortError') {
+                            console.log('User cancelled file selection');
+                            return;
+                        }
+                        console.warn('File System Access API failed, falling back to input:', err);
+                    }
+                }
+                
+                // Fallback: Traditional file input
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = '.json';
+                
+                input.onchange = function(event) {
+                    const file = event.target.files[0];
+                    if (!file) return;
+                    
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        try {
+                            const importedProjects = JSON.parse(e.target.result);
+                            
+                            if (!Array.isArray(importedProjects)) {
+                                alert('❌ Invalid file format. Expected an array of projects.');
+                                return;
+                            }
+                            
+                            processImportedProjects(importedProjects, file.name);
+                            
+                        } catch (error) {
+                            console.error('Import error:', error);
+                            alert('❌ Error importing projects: ' + error.message);
+                        }
+                    };
+                    
+                    reader.readAsText(file);
+                };
+                
+                input.click();
+                
+            } catch (error) {
+                console.error('Import error:', error);
+                alert('❌ Error during import: ' + error.message);
+            }
+        }
+        
+        // Process imported projects (helper function)
+        function processImportedProjects(importedProjects, filename) {
+            const existingProjects = getProjects();
+            
+            const action = confirm(
+                `📁 File: ${filename}\n` +
+                `Found ${importedProjects.length} projects in file.\n\n` +
+                `Current storage has ${existingProjects.length} projects.\n\n` +
+                `Click OK to MERGE (combine both)\n` +
+                `Click Cancel to REPLACE (use imported data only)`
+            );
+            
+            let finalProjects;
+            
+            if (action) {
+                // Merge - keep existing and add imported (avoid ID conflicts)
+                const mergedMap = new Map();
+                existingProjects.forEach(p => mergedMap.set(p.id, p));
+                importedProjects.forEach(p => {
+                    if (mergedMap.has(p.id)) {
+                        // ID conflict - create new ID
+                        p.id = p.id + '-imported-' + Date.now();
+                    }
+                    mergedMap.set(p.id, p);
+                });
+                finalProjects = Array.from(mergedMap.values());
+            } else {
+                // Replace
+                finalProjects = importedProjects;
+            }
+            
+            // Save to localStorage
+            saveProjects(finalProjects);
+            
+            // Refresh the view
+            refreshProjectsView();
+            
+            showNotification(`✅ Successfully imported ${importedProjects.length} projects from ${filename}!`, 'success');
+            alert(`✅ Import successful!\n\nTotal projects now: ${finalProjects.length}`);
+        }
+        
+        // Refresh projects view
+        function refreshProjectsView() {
+            updateStats();
+            renderProjects();
+        }
+        
+        // Utility: Escape HTML
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        // Notification system
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            notification.style.cssText = `
+                position: fixed;
+                top: 100px;
+                right: 20px;
+                padding: 15px 20px;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                z-index: 10000;
+                background: ${type === 'success' ? '#27ae60' : '#e74c3c'};
+                color: white;
+                font-weight: 500;
+                animation: slideIn 0.3s ease;
+            `;
+            
+            document.body.appendChild(notification);
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+        
+        // ============================================
+        // PUBLIC API FOR EXTERNAL CONFIGURATORS
+        // ============================================
+        window.SmartFabXProjectAPI = {
+            // Get all projects
+            getProjects: getProjects,
+            
+            // Add assembly to a project
+            addAssemblyToProject: function(projectId, assemblyData) {
+                const projects = getProjects();
+                const project = projects.find(p => p.id === projectId);
+                
+                if (!project) {
+                    console.error('Project not found:', projectId);
+                    return false;
+                }
+                
+                if (!project.assemblies) {
+                    project.assemblies = [];
+                }
+                
+                // Add timestamp if not present
+                if (!assemblyData.timestamp) {
+                    assemblyData.timestamp = Date.now();
+                }
+                
+                project.assemblies.push(assemblyData);
+                project.updatedAt = Date.now();
+                
+                if (saveProjects(projects)) {
+                    console.log('✅ Assembly added to project:', projectId);
+                    refreshProjectsView();
+                    return true;
+                }
+                
+                return false;
+            },
+            
+            // Show save dialog for configurators
+            showSaveDialog: function(assemblyData) {
+                const projects = getProjects();
+                
+                if (projects.length === 0) {
+                    alert('Please create a project first before saving assemblies.');
+                    return;
+                }
+                
+                let projectOptions = projects.map((p, i) => 
+                    `${i + 1}. ${p.projectName} (${p.jobNumber || 'No Job#'})`
+                ).join('\n');
+                
+                const choice = prompt(`Select a project to save this assembly:\n\n${projectOptions}\n\nEnter project number (1-${projects.length}):`);
+                
+                if (choice) {
+                    const index = parseInt(choice) - 1;
+                    if (index >= 0 && index < projects.length) {
+                        const success = this.addAssemblyToProject(projects[index].id, assemblyData);
+                        if (success) {
+                            showNotification('✅ Assembly saved to project!', 'success');
+                        }
+                    } else {
+                        alert('Invalid project number');
+                    }
+                }
+            },
+            
+            // Refresh view
+            refresh: refreshProjectsView
+        };
+        
+        // ============================================
+        // NAVIGATION FUNCTIONALITY
+        // ============================================
+        function showSection(sectionId, buttonElement) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+
+            // Remove active class from all nav buttons
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                if (!btn.classList.contains('nav-btn-load') && !btn.classList.contains('nav-btn-print')) {
+                    btn.classList.remove('active');
+                }
+            });
+
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
+
+            // Add active class to clicked button
+            if (buttonElement) {
+                buttonElement.classList.add('active');
+            }
+            
+            // If showing projects section, refresh data
+            if (sectionId === 'projects') {
+                refreshProjectsView();
+            }
+        }
+
+        function loadSaved() {
+            importProjects();
+        }
+
+        function printPage() {
+            window.print();
+        }
+
+        // ============================================
+        // INITIALIZATION
+        // ============================================
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('✅ SmartFabX Project Management System Loaded');
+            console.log('📡 Public API Available: window.SmartFabXProjectAPI');
+            
+            // Initialize stats and view
+            refreshProjectsView();
+            
+            // Auto-refresh stats every 30 seconds
+            setInterval(() => {
+                if (document.visibilityState === 'visible') {
+                    updateStats();
+                }
+            }, 30000);
+            
+            // Modal event handlers
+            setupModalHandlers();
+        });
+        
+        // Setup modal event handlers
+        function setupModalHandlers() {
+            // ESC key to close modals
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    const projectModal = document.getElementById('projectModal');
+                    const copyModal = document.getElementById('copyAssemblyModal');
+                    const deleteModal = document.getElementById('deleteConfirmModal');
+                    if (projectModal.style.display === 'flex') {
+                        closeProjectModal();
+                    }
+                    if (copyModal.style.display === 'flex') {
+                        closeCopyAssemblyModal();
+                    }
+                    if (deleteModal.style.display === 'flex') {
+                        closeDeleteConfirmModal();
+                    }
+                }
+            });
+            
+            // Click outside to close modals
+            document.getElementById('projectModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeProjectModal();
+                }
+            });
+            
+            document.getElementById('copyAssemblyModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeCopyAssemblyModal();
+                }
+            });
+            
+            document.getElementById('deleteConfirmModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeDeleteConfirmModal();
+                }
+            });
+            
+            // Enter key to submit forms
+            document.getElementById('modalProjectName').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') saveProjectFromModal();
+            });
+            document.getElementById('copyPositionCode').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') confirmCopyAssembly();
+            });
+        }
+    </script>
+
+    <!-- Create/Edit Project Modal -->
+    <div id="projectModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000; justify-content: center; align-items: center;">
+        <div style="background: white; border-radius: 12px; width: 90%; max-width: 600px; max-height: 85vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+            <div style="background: linear-gradient(135deg, #0ea5e9, #06b6d4); padding: 25px; border-radius: 12px 12px 0 0; color: white;">
+                <h2 id="projectModalTitle" style="margin: 0; font-size: 24px; font-weight: 700;">Create New Project</h2>
+                <p style="margin: 8px 0 0 0; opacity: 0.9; font-size: 14px;">Fill in the project details below</p>
+            </div>
+            <div style="padding: 30px;">
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; font-weight: 600; margin-bottom: 8px; color: #334155; font-size: 14px;">
+                        Project Name <span style="color: #ef4444;">*</span>
+                    </label>
+                    <input type="text" id="modalProjectName" placeholder="e.g., Tower A - Level 23" style="width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 14px; transition: all 0.3s;" onfocus="this.style.borderColor='#0ea5e9'" onblur="this.style.borderColor='#e2e8f0'">
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                    <div>
+                        <label style="display: block; font-weight: 600; margin-bottom: 8px; color: #334155; font-size: 14px;">
+                            Job Number <span style="color: #ef4444;">*</span>
+                        </label>
+                        <input type="text" id="modalJobNumber" placeholder="e.g., JOB-2024-001" style="width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 14px; transition: all 0.3s;" onfocus="this.style.borderColor='#0ea5e9'" onblur="this.style.borderColor='#e2e8f0'">
+                    </div>
+                    <div>
+                        <label style="display: block; font-weight: 600; margin-bottom: 8px; color: #334155; font-size: 14px;">
+                            Project Manager <span style="color: #ef4444;">*</span>
+                        </label>
+                        <input type="text" id="modalProjectManager" placeholder="e.g., John Smith" style="width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 14px; transition: all 0.3s;" onfocus="this.style.borderColor='#0ea5e9'" onblur="this.style.borderColor='#e2e8f0'">
+                    </div>
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; font-weight: 600; margin-bottom: 8px; color: #334155; font-size: 14px;">
+                        Location <span style="color: #ef4444;">*</span>
+                    </label>
+                    <input type="text" id="modalLocation" placeholder="e.g., Dubai, UAE" style="width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 14px; transition: all 0.3s;" onfocus="this.style.borderColor='#0ea5e9'" onblur="this.style.borderColor='#e2e8f0'">
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                    <div>
+                        <label style="display: block; font-weight: 600; margin-bottom: 8px; color: #334155; font-size: 14px;">Approved Glass</label>
+                        <input type="text" id="modalGlass" placeholder="e.g., 6mm Clear Tempered" style="width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 14px; transition: all 0.3s;" onfocus="this.style.borderColor='#0ea5e9'" onblur="this.style.borderColor='#e2e8f0'">
+                    </div>
+                    <div>
+                        <label style="display: block; font-weight: 600; margin-bottom: 8px; color: #334155; font-size: 14px;">Approved Finish</label>
+                        <input type="text" id="modalFinish" placeholder="e.g., Anodized Silver" style="width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 14px; transition: all 0.3s;" onfocus="this.style.borderColor='#0ea5e9'" onblur="this.style.borderColor='#e2e8f0'">
+                    </div>
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; font-weight: 600; margin-bottom: 8px; color: #334155; font-size: 14px;">Status</label>
+                    <select id="modalStatus" style="width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 14px; background: white; cursor: pointer; transition: all 0.3s;" onfocus="this.style.borderColor='#0ea5e9'" onblur="this.style.borderColor='#e2e8f0'">
+                        <option value="planning">Planning</option>
+                        <option value="in-progress">In Progress</option>
+                        <option value="active">Active</option>
+                        <option value="on-hold">On Hold</option>
+                        <option value="completed">Completed</option>
+                        <option value="cancelled">Cancelled</option>
+                    </select>
+                </div>
+                <div style="margin-bottom: 25px;">
+                    <label style="display: block; font-weight: 600; margin-bottom: 8px; color: #334155; font-size: 14px;">Notes</label>
+                    <textarea id="modalNotes" placeholder="Add any additional notes or comments..." rows="3" style="width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 14px; font-family: inherit; resize: vertical; transition: all 0.3s;" onfocus="this.style.borderColor='#0ea5e9'" onblur="this.style.borderColor='#e2e8f0'"></textarea>
+                </div>
+                <div style="display: flex; gap: 12px; justify-content: flex-end; padding-top: 20px; border-top: 1px solid #e2e8f0;">
+                    <button onclick="closeProjectModal()" style="padding: 12px 24px; border: 2px solid #e2e8f0; border-radius: 8px; background: white; color: #64748b; font-weight: 600; cursor: pointer; font-size: 14px; transition: all 0.3s;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='white'">
+                        Cancel
+                    </button>
+                    <button onclick="saveProjectFromModal()" style="padding: 12px 32px; border: none; border-radius: 8px; background: linear-gradient(135deg, #10b981, #059669); color: white; font-weight: 600; cursor: pointer; font-size: 14px; transition: all 0.3s; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(16, 185, 129, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(16, 185, 129, 0.3)'">
+                        <span id="saveProjectBtnText">Create Project</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Copy Assembly Modal -->
+    <div id="copyAssemblyModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000; justify-content: center; align-items: center;">
+        <div style="background: white; border-radius: 12px; width: 90%; max-width: 500px; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+            <div style="background: linear-gradient(135deg, #0ea5e9, #06b6d4); padding: 20px; border-radius: 12px 12px 0 0; color: white;">
+                <h2 style="margin: 0; font-size: 22px; font-weight: 700;">📋 Copy Assembly</h2>
+                <p style="margin: 8px 0 0 0; opacity: 0.9; font-size: 14px;">Create a duplicate with a new position code</p>
+            </div>
+            <div style="padding: 25px;">
+                <div style="background: #f0f9ff; border-left: 4px solid #0ea5e9; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                    <div style="font-size: 13px; color: #0369a1;">
+                        <strong>Original Assembly:</strong>
+                        <div id="copyOriginalInfo" style="margin-top: 8px; font-size: 12px; color: #0c4a6e;"></div>
+                    </div>
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; font-weight: 600; margin-bottom: 8px; color: #334155; font-size: 14px;">
+                        New Position Code <span style="color: #ef4444;">*</span>
+                    </label>
+                    <input type="text" id="copyPositionCode" placeholder="e.g., W01-COPY" style="width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 14px; transition: all 0.3s;" onfocus="this.style.borderColor='#0ea5e9'" onblur="this.style.borderColor='#e2e8f0'">
+                    <div style="font-size: 12px; color: #64748b; margin-top: 6px;">
+                        💡 Tip: Use a unique identifier to distinguish from the original
+                    </div>
+                </div>
+                <div style="display: flex; gap: 12px; justify-content: flex-end; padding-top: 15px; border-top: 1px solid #e2e8f0;">
+                    <button onclick="closeCopyAssemblyModal()" style="padding: 10px 20px; border: 2px solid #e2e8f0; border-radius: 8px; background: white; color: #64748b; font-weight: 600; cursor: pointer; font-size: 14px; transition: all 0.3s;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='white'">
+                        Cancel
+                    </button>
+                    <button onclick="confirmCopyAssembly()" style="padding: 10px 24px; border: none; border-radius: 8px; background: linear-gradient(135deg, #0ea5e9, #06b6d4); color: white; font-weight: 600; cursor: pointer; font-size: 14px; transition: all 0.3s; box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(14, 165, 233, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(14, 165, 233, 0.3)'">
+                        Create Copy
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteConfirmModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000; justify-content: center; align-items: center;">
+        <div style="background: white; border-radius: 12px; width: 90%; max-width: 480px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); animation: modalSlideIn 0.3s ease-out;">
+            <div style="background: linear-gradient(135deg, #ef4444, #dc2626); padding: 20px; border-radius: 12px 12px 0 0; color: white;">
+                <h2 style="margin: 0; font-size: 22px; font-weight: 700;">⚠️ Confirm Deletion</h2>
+                <p style="margin: 8px 0 0 0; opacity: 0.9; font-size: 14px;">This action cannot be undone</p>
+            </div>
+            <div style="padding: 25px;">
+                <div style="background: #fef2f2; border-left: 4px solid #ef4444; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                    <div style="font-size: 14px; color: #991b1b;">
+                        <strong id="deleteModalTitle">Are you sure?</strong>
+                        <div id="deleteModalMessage" style="margin-top: 8px; font-size: 13px; color: #b91c1c; line-height: 1.5;"></div>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                    <button onclick="closeDeleteConfirmModal()" style="padding: 10px 24px; border: 2px solid #e2e8f0; border-radius: 8px; background: white; color: #64748b; font-weight: 600; cursor: pointer; font-size: 14px; transition: all 0.3s;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='white'">
+                        Cancel
+                    </button>
+                    <button onclick="confirmDelete()" style="padding: 10px 24px; border: none; border-radius: 8px; background: linear-gradient(135deg, #ef4444, #dc2626); color: white; font-weight: 600; cursor: pointer; font-size: 14px; transition: all 0.3s; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(239, 68, 68, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(239, 68, 68, 0.3)'">
+                        Delete
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- BOM & Optimization Modal -->
+    <div id="bomOptimizationModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000; overflow-y: auto; padding: 20px;">
+        <div style="background: white; border-radius: 12px; width: 95%; max-width: 1400px; margin: 0 auto; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+            <div style="background: linear-gradient(135deg, #9b59b6, #8e44ad); padding: 20px; border-radius: 12px 12px 0 0; color: white; position: sticky; top: 0; z-index: 1;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h2 style="margin: 0; font-size: 24px; font-weight: 700;">📊 Bill of Materials & Optimization</h2>
+                        <p id="bomModalSubtitle" style="margin: 8px 0 0 0; opacity: 0.9; font-size: 14px;">Assembly Details</p>
+                    </div>
+                    <button onclick="closeBOMModal()" style="background: rgba(255,255,255,0.2); border: none; color: white; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; font-size: 20px; font-weight: bold; transition: all 0.3s;" onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'">
+                        ✕
+                    </button>
+                </div>
+            </div>
+            <div style="padding: 25px;">
+                <!-- Assembly Info -->
+                <div id="bomAssemblyInfo" style="background: #f0f9ff; border-left: 4px solid #0ea5e9; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                </div>
+
+                <!-- Stock List / BOM -->
+                <div style="margin-bottom: 30px;">
+                    <h3 style="color: #8e44ad; margin-bottom: 15px; font-size: 20px;">📋 Stock List (Bill of Materials)</h3>
+                    <div id="bomStockListContent" style="overflow-x: auto;">
+                        <!-- Stock list table will be inserted here -->
+                    </div>
+                </div>
+
+                <!-- Optimization Results -->
+                <div style="margin-bottom: 20px;">
+                    <h3 style="color: #8e44ad; margin-bottom: 15px; font-size: 20px;">🔧 Cut Optimization Results</h3>
+                    <div id="bomOptimizationContent">
+                        <!-- Optimization results will be inserted here -->
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 12px; justify-content: flex-end; padding-top: 20px; border-top: 1px solid #e2e8f0;">
+                    <button onclick="printBOMReport()" style="padding: 12px 24px; border: none; border-radius: 8px; background: linear-gradient(135deg, #10b981, #059669); color: white; font-weight: 600; cursor: pointer; font-size: 14px; transition: all 0.3s; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+                        🖨️ Print Report
+                    </button>
+                    <button onclick="closeBOMModal()" style="padding: 12px 24px; border: 2px solid #e2e8f0; border-radius: 8px; background: white; color: #64748b; font-weight: 600; cursor: pointer; font-size: 14px; transition: all 0.3s;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='white'">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
